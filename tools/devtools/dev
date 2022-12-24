@@ -1,0 +1,13 @@
+#!/usr/bin/env python3
+"""Entrypoint for devtools."""
+import os
+
+from devtools.cli import cli
+
+if __name__ == "__main__":
+    if profiling := bool(os.environ.get("PROFILING", False)):
+        import cProfile
+
+        cProfile.run("cli", sort="cumtime")
+    else:
+        cli()  # pylint:disable=no-value-for-parameter

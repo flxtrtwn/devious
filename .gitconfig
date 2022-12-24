@@ -1,0 +1,23 @@
+[user]
+    name = flxtrtwn
+    email = mail@felixtrautwein.de
+[credential]
+    # For WSL2
+    helper = /mnt/c/Program\\ Files/Git/mingw64/bin/git-credential-manager.exe
+[push]
+    default = simple
+    recurseSubmodules = check
+[core]
+    trustctime = false # See https://www.git-tower.com/blog/make-git-rebase-safe-on-osx/
+    editor = vim
+    # filemode = false see https://stackoverflow.com/questions/1580596/how-do-i-make-git-ignore-file-mode-chmod-changes
+    autocrlf = false
+[filter "lfs"]
+    clean = git-lfs clean -- %f
+    smudge = git-lfs smudge -- %f
+    required = true
+    process = git-lfs filter-process
+[gc]
+    autoDetach=false
+[pull]
+    rebase = true

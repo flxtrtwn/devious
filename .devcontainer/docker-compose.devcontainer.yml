@@ -1,0 +1,32 @@
+version: '3.4'
+volumes:
+    cache:
+        name: cache-${USER}
+services:
+    devcontainer:
+        build:
+            context: ..
+            dockerfile: .devcontainer/Dockerfile
+            target: devcontainer
+            args:
+                USER: ${USER}
+                UBUNTU_VERSION: ${UBUNTU_VERSION}
+                DOCKER: ${DOCKER}
+                GPP_VERSION: ${GPP_VERSION}
+                CUSTOM_PYTHON_VERSION: ${CUSTOM_PYTHON_VERSION}
+        cap_add:
+            - SYS_PTRACE
+        security_opt:
+            - seccomp:unconfined
+        user: ${USER}
+        tty: true
+        environment:
+            WORKSPACE_FOLDER: /workspace
+        working_dir: /workspace
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+            - ..:/workspace:cached
+            - cache:/home/${USER}/.cache
+            - ${HOME}/.netrc:/home/${USER}/.netrc
+            - ${HOME}/.Xauthority:/home/${USER}/.Xauthority
+            - ${HOME}/.ssh/:/home/${USER}/.ssh

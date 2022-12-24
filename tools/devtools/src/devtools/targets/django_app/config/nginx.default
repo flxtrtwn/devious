@@ -1,0 +1,45 @@
+upstream app {
+    server localhost:${APPLICATION_PORT};
+}
+
+server {
+        listen 80 default_server;
+        listen [::]:80 default_server;
+        server_name _;
+        server_tokens off;
+        location /.well-known/acme-challenge/ {
+            root /var/www/certbot;
+        }
+        return 301 https://$$host$$request_uri;
+}
+server {
+    listen 443 ssl http2 default_server;
+    listen [::]:443 ssl http2 default_server;
+    server_name _;
+    server_tokens off;
+
+    ssl_certificate /etc/nginx/ssl/live/${DOMAIN_NAME}/fullchain.pem;
+    ssl_certificate_key /etc/nginx/ssl/live/${DOMAIN_NAME}/privkey.pem;
+    # TODO: Fix ssl settings https://www.sherbers.de/sichere-tls-konfiguration-mit-nginx/
+    ssl_session_cache shared:le_nginx_SSL:10m;
+    ssl_session_timeout 1440m;
+    ssl_session_tickets off;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_prefer_server_ciphers off;
+    ssl_ciphers "ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384";
+    ssl_dhparam /etc/ssl/certs/dhparam.pem;
+    add_header X-Frame-Options DENY;
+
+    location / {
+        resolver 127.0.0.11;
+        proxy_pass http://app;
+        proxy_set_header Host $$host;
+        proxy_set_header X-Forwarded-For $$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $$scheme;
+        # TODO: Figure out redirects https://mattsegal.dev/nginx-django-reverse-proxy-config.html
+        # proxy_redirect off;
+    }
+    location /static {
+        alias ${DEPLOYMENT_DIR}/app/staticfiles;
+    }
+}

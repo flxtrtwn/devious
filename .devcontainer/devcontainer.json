@@ -1,0 +1,69 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/docker-existing-docker-compose
+{
+    "name": "devcontainer-${localEnv:USER}-${localWorkspaceFolderBasename}",
+    // Update the 'dockerComposeFile' list if you have more compose files or use different names.
+    // The .devcontainer/docker-compose.yml file contains any overrides you need/want to make.
+    "dockerComposeFile": ["docker-compose.devcontainer.yml"],
+    // The 'service' property is the name of the service for the container that VS Code should
+    // use. Update this value and .devcontainer/docker-compose.yml to the real service name.
+    "service": "devcontainer",
+    // The optional 'workspaceFolder' property is the path VS Code should open by default when
+    // connected. This is typically a file mount in .devcontainer/docker-compose.yml
+    "workspaceFolder": "/workspace",
+    "remoteEnv": {
+        "WORKSPACE_FOLDER": "${containerWorkspaceFolder}"
+    },
+    "initializeCommand": "${localWorkspaceFolder}/.devcontainer/initializeCommand.sh",
+    "postAttachCommand": ".devcontainer/postAttachCommand.sh",
+    // TODO: Check out interesting features
+    // Features to add to the dev container. More info: https://containers.dev/features.
+    // "features": {
+    // 	"ghcr.io/devcontainers/features/azure-cli:1": {
+    // 		"version": "latest"
+    // 	}
+    // },
+    // Use 'forwardPorts' to make a list of ports inside the container available locally.
+    // "forwardPorts": [],
+    // Uncomment the next line if you want start specific services in your Docker Compose config.
+    // "runServices": ["app"],
+    // Uncomment the next line if you want to keep your containers running after VS Code shuts down.
+    // "shutdownAction": "none",
+    // Uncomment the next line to run commands after the container is created.
+    // "postCreateCommand": "cat /etc/os-release",
+    // Configure tool-specific properties.
+    "customizations": {
+        "vscode": {
+            "settings": {
+                "terminal.integrated.profiles.linux":{
+                    "zsh": {
+                        "path": "/usr/bin/zsh"
+
+                    }
+                },
+                "terminal.integrated.defaultProfile.linux": "zsh"
+            },
+            "extensions": [
+                "bbenoist.doxygen",
+                "davidbroetje.algorithm-mnemonics-vscode",
+                "eamodio.gitlens",
+                "esbenp.prettier-vscode",
+                "GitHub.vscode-pull-request-github",
+                "Gruntfuggly.todo-tree",
+                "littlefoxteam.vscode-python-test-adapter",
+                "ms-python.pylint",
+                "ms-python.python",
+                "ms-azuretools.vscode-docker",
+                "ms-python.black-formatter",
+                "ms-python.isort",
+                "ms-vscode.test-adapter-converter",
+                "redhat.vscode-yaml",
+                "rubymaniac.vscode-direnv",
+                "timonwong.shellcheck",
+                "trond-snekvik.simple-rst"
+            ]
+        }
+    }
+    // Uncomment to connect as an existing user other than the container default. More info: https://aka.ms/dev-containers-non-root.
+    // "remoteUser": "devcontainer"
+}
