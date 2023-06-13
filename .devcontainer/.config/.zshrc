@@ -40,6 +40,6 @@ if [[ -f "${WORKSPACE_FOLDER}/.devcontainer/.config/.user_aliases" ]]; then
     source "${WORKSPACE_FOLDER}/.devcontainer/.config/.user_aliases"
 fi
 
-if [[ -r "${$HOME}/.cache/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-    source "${$HOME}/.cache/p10k-instant-prompt-${(%):-%n}.zsh"
+if [[ -r "${HOME}/.cache/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+    source "${HOME}/.cache/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
