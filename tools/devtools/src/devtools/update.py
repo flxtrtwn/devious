@@ -20,8 +20,6 @@ logger = logging.getLogger()
 def update(private_remote: str) -> None:
     """Update dev environment if in a detached private repository."""
     devcontainer_repo_remote = "https://github.com/flxtrtwn/devcontainer.git"
-    devcontainer_repo_folder = Path("/tmp/devcontainer")
-    devcontainer_repo_folder.mkdir(parents=True)
     current_remote = git.query_remote()
     if current_remote == devcontainer_repo_remote:
         if not click.confirm(
@@ -30,6 +28,8 @@ def update(private_remote: str) -> None:
         ):
             sys.exit(0)
         else:
+            devcontainer_repo_folder = Path("/tmp/devcontainer")
+            devcontainer_repo_folder.mkdir(parents=True)
             git.remote_rename("origin", "upstream")
             git.remote_add("origin", private_remote)
             with switch_dir(devcontainer_repo_folder):
