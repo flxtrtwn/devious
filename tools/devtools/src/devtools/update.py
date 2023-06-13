@@ -16,7 +16,7 @@ logger = logging.getLogger()
 
 
 @click.command()
-@click.option("--private_remote", type=str, required=True)
+@click.option("--private-remote", type=str)
 def update(private_remote: str) -> None:
     """Update dev environment if in a detached private repository."""
     devcontainer_repo_remote = "https://github.com/flxtrtwn/devcontainer.git"
@@ -28,6 +28,9 @@ def update(private_remote: str) -> None:
         ):
             sys.exit(0)
         else:
+            if not private_remote:
+                logger.error("You need to specify --private-remote for this.")
+                sys.exit(1)
             devcontainer_repo_folder = Path("/tmp/devcontainer")
             devcontainer_repo_folder.mkdir(parents=True)
             git.remote_rename("origin", "upstream")
