@@ -18,12 +18,17 @@ def push(remote: str = "origin", force: bool = False, mirror: bool = False) -> N
 
 
 def query_remote(remote_name: str = "origin") -> str | Any:
-    query_remote_cmd = ["git", "remote", remote_name]
+    query_remote_cmd = ["git", "remote", "show", remote_name]
     completed_process = subprocess.run(query_remote_cmd, capture_output=True, text=True)
-    if match := re.search(r"Push\s+URL: (https://.*?.git)", completed_process.stdout):
+    print(str(completed_process.stdout))
+    if match := re.search(
+        r"Push\s+URL: (https://.*?.git)", str(completed_process.stdout)
+    ):
         return match.group(1)
     raise ValueError(
-        "No remote found, output of %s: %s", query_remote_cmd, completed_process.stdout
+        "No remote found, output of %s: %s",
+        query_remote_cmd,
+        str(completed_process.stdout),
     )
 
 
