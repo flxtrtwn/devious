@@ -1,6 +1,7 @@
 """Wraps git commands."""
 import subprocess
 from pathlib import Path
+from typing import Any
 
 import regex as re
 
@@ -16,7 +17,7 @@ def push(remote: str = "origin", force: bool = False, mirror: bool = False) -> N
     subprocess.run(push_cmd)
 
 
-def query_remote(remote_name: str = "origin"):
+def query_remote(remote_name: str = "origin") -> str | Any:
     query_remote_cmd = ["git", "remote", remote_name]
     completed_process = subprocess.run(query_remote_cmd, capture_output=True, text=True)
     if match := re.search(r"Push\s+URL: (https://.*?.git)", completed_process.stdout):
@@ -37,6 +38,11 @@ def clone(repo: str, folder: Path = Path("."), bare: bool = False) -> None:
 def remote_add(name: str, target_repo: str) -> None:
     remote_add_cmd = ["git", "remote", "add", name, target_repo]
     subprocess.run(remote_add_cmd)
+
+
+def remote_rename(old_name: str, new_name: str) -> None:
+    remote_rename_cmd = ["git", "remote", "rename", old_name, new_name]
+    subprocess.run(remote_rename_cmd)
 
 
 def pull(remote: str = "origin", branch: str = "main"):
