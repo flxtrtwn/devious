@@ -9,6 +9,7 @@ Currently supports the following application types:
 
 ## USAGE
 
+-   If you want to use this for private repositories and still sync with this upstream (public) repository, refer to
 -   (Optional) Configure devcontainer in .devcontainer/.env file (e.g. Python version).
 -   Create your application with (see "dev create -h")
 -   Register your application in tools/devtools/src/devtools/registered_targets.py (TODO: Possibly automate with user input.)

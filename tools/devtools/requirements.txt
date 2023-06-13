@@ -1,4 +1,5 @@
 click
+regex
 jstyleson
 paramiko
 ruamel.yaml
