@@ -53,3 +53,7 @@ def remote_rename(old_name: str, new_name: str) -> None:
 def pull(remote: str = "origin", branch: str = "main"):
     pull_cmd = ["git", "pull", remote, branch]
     subprocess.run(pull_cmd)
+
+def set_default_remote(remote_name:str="origin", local_branch_name:str="main", remote_branch_name:str="main"):
+    set_default_remote_cmd(["git", "push", "-u", f"{local_branch_name}:{remote_branch_name}"])
+    subprocess.run(set_default_remote_cmd)
