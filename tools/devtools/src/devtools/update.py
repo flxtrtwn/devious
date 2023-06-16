@@ -42,7 +42,7 @@ def update(private_remote: str) -> None:
             shutil.rmtree(devcontainer_repo_folder)
             git.set_default_remote_for_branch()
     git.pull(remote="upstream")
-    git.push(force=True)
+    git.push()
 
 
 @contextmanager
