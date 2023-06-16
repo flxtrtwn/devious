@@ -51,8 +51,9 @@ class DjangoApp(Target):
         subprocess.run(
             ["django-admin", "startproject", target_name, target_src_dir.as_posix()]
         )
+        subprocess.run(["chmod", "+x", (target_src_dir / "manage.py").as_posix()])
         requirements_file = target_dir / "requirements.txt"
-        requirements_file.touch()  # TODO: Is this really created?
+        requirements_file.touch()
         docker_compose_file = target_dir / "docker-compose.yaml"
         ruamel.yaml.YAML().dump(
             {
