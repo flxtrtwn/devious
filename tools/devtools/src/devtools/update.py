@@ -32,7 +32,7 @@ def update(private_remote: str, strategy: str) -> None:
             sys.exit(0)
         else:
             if not private_remote:
-                logger.error("You need to specify --private-remote for this.")
+                logger.error("You need to specify --private-remote for the initial update setup.")
                 sys.exit(1)
             devcontainer_repo_folder = Path("/tmp/devcontainer")
             devcontainer_repo_folder.mkdir(parents=True)
