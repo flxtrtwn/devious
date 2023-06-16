@@ -19,8 +19,9 @@ logger = logging.getLogger()
 @click.option("--private-remote", type=str)
 @click.option("--strategy", type=click.Choice(["squash", "merge", "rebase"]), default="squash", help="Set merge strategy for upstream commits.")
 def update(private_remote: str, strategy: str) -> None:
-    """Update dev environment if in a detached private repository.
-        Will pull the latest upstream commits on your branch and push it."""
+    """Update dev environment if in a detached private repository. Will pull the latest upstream commits on your branch and push it.
+    strategy: The way the update is applied, defaults to having a single squash commit."""
+
     devcontainer_repo_remote = "https://github.com/flxtrtwn/devcontainer.git"
     current_remote = git.query_remote()
     if current_remote == devcontainer_repo_remote:
