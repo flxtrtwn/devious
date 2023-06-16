@@ -50,9 +50,12 @@ def remote_rename(old_name: str, new_name: str) -> None:
     subprocess.run(remote_rename_cmd)
 
 
-def pull(remote: str = "origin", branch: str = "main", rebase:bool=False) -> None:
+def pull(remote: str = "origin", branch: str = "main", strategy: str = "merge") -> None:
+    if strategy not in ["merge", "squash", "rebase"]:
+        raise ValueError("Invalid pull strategy.")
     pull_cmd = ["git", "pull"]
-    pull_cmd.extend([f"--rebase={str(rebase).lower()}"])
+    if strategy != "merge":
+        pull_cmd.extend([f"--{strategy}"])
     pull_cmd.extend([remote, branch])
     subprocess.run(pull_cmd)
 
