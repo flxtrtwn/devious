@@ -9,7 +9,7 @@ import regex as re
 def push(remote: str = "origin", force: bool = False, mirror: bool = False) -> None:
     push_cmd = ["git", "push"]
     if force:
-        push_cmd.extend(["-f"])
+        push_cmd.extend(["--force-with-lease"])
     if mirror:
         push_cmd.extend(["--mirror"])
     if remote:
