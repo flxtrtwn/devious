@@ -17,7 +17,8 @@ logger = logging.getLogger()
 
 @click.command()
 @click.option("--private-remote", type=str)
-def update(private_remote: str) -> None:
+@click.option("--rebase", is_flag=True, default=False, help="Add origin commits on top of upstream using rebase.")
+def update(private_remote: str, rebase: bool) -> None:
     """Update dev environment if in a detached private repository.
         Will pull the latest upstream commits on your branch and push it."""
     devcontainer_repo_remote = "https://github.com/flxtrtwn/devcontainer.git"
@@ -41,7 +42,7 @@ def update(private_remote: str) -> None:
                 git.push(mirror=True, remote=private_remote)
             shutil.rmtree(devcontainer_repo_folder)
             git.set_default_remote_for_branch()
-    git.pull(remote="upstream")
+    git.pull(remote="upstream", rebase=rebase)
     git.push()
 
 
