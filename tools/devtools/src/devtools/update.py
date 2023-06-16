@@ -18,7 +18,8 @@ logger = logging.getLogger()
 @click.command()
 @click.option("--private-remote", type=str)
 def update(private_remote: str) -> None:
-    """Update dev environment if in a detached private repository."""
+    """Update dev environment if in a detached private repository.
+        Will pull the latest upstream commits on your branch and push it."""
     devcontainer_repo_remote = "https://github.com/flxtrtwn/devcontainer.git"
     current_remote = git.query_remote()
     if current_remote == devcontainer_repo_remote:
