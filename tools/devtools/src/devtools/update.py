@@ -39,7 +39,7 @@ def update(private_remote: str) -> None:
                 git.clone(devcontainer_repo_remote, bare=True)
                 git.push(mirror=True, remote=private_remote)
             shutil.rmtree(devcontainer_repo_folder)
-            git.set_default_remote()
+            git.set_default_remote_for_branch()
     git.pull(remote="upstream")
     git.push(force=True)
 
