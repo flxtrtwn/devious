@@ -56,6 +56,8 @@ def pull(remote: str = "origin", branch: str = "main", strategy: str = "merge") 
     pull_cmd = ["git", "pull"]
     if strategy != "merge":
         pull_cmd.extend([f"--{strategy}"])
+    if strategy != "rebase":
+        pull_cmd.extend(["--no-rebase"])
     pull_cmd.extend([remote, branch])
     subprocess.run(pull_cmd)
 
