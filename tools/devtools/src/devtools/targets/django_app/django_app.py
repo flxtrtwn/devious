@@ -239,6 +239,7 @@ def set_up_ssl_cert(
     safe_nginx_conf: PurePath,
     domain_name: str,
     email: str,
+    test_cert: bool = False,
 ) -> list[str]:
     backup_nginx_conf = safe_nginx_conf.parent / "nginx.default.backup"
     backup_cmd = [
@@ -262,7 +263,6 @@ def set_up_ssl_cert(
         "certonly",
         "-v",
         "--agree-tos",
-        "--test-cert",  # TODO: Get full cert
         "--non-interactive",
         "--email",
         email,
@@ -272,6 +272,8 @@ def set_up_ssl_cert(
         "-d",
         domain_name,
     ]
+    if test_cert:
+        set_up_ssl_cert_cmd.extend(["--test-cert"])
     restore_safe_conf_cmd = [
         "cp",
         backup_nginx_conf.as_posix(),
