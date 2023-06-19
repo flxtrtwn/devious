@@ -118,9 +118,9 @@ class DjangoApp(Target):
     def test(self) -> None:
         pass
 
-    def deploy(self, ip_address: str) -> None:
+    def deploy(self) -> None:
         subprocess.run([str(self.build_django_manager), "check", "--deploy"])
-        with ssh.SSHSession(ip_address) as session:
+        with ssh.SSHSession(self.domain_name) as session:
             if session.run(["command", "-v", "docker", ">/dev/null 2>&1"]):
                 session.run(docker.install_docker())
             if session.run(["command", "-v", "python", ">/dev/null 2>&1"]):
@@ -160,8 +160,8 @@ class DjangoApp(Target):
             )
             # TODO: docker compose run --rm certbot renew as cronjob
 
-    def run(self, ip_address: str) -> None:
-        with ssh.SSHSession(ip_address) as session:
+    def run(self) -> None:
+        with ssh.SSHSession(self.domain_name) as session:
             session.run(
                 docker.docker_compose_up(
                     docker_compose_yaml=self.deployed_docker_compose_yaml,
@@ -194,8 +194,8 @@ class DjangoApp(Target):
             ]
         )
 
-    def stop(self, ip_address: str) -> None:
-        with ssh.SSHSession(ip_address) as session:
+    def stop(self) -> None:
+        with ssh.SSHSession(self.domain_name) as session:
             session.run(
                 docker.docker_compose_stop(
                     docker_compose_yaml=self.deployed_docker_compose_yaml,

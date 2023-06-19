@@ -104,8 +104,8 @@ class Microservice(Target):
     def test(self) -> None:
         pass
 
-    def deploy(self, ip_address: str) -> None:
-        with ssh.SSHSession(ip_address) as session:
+    def deploy(self) -> None:
+        with ssh.SSHSession(self.domain_name) as session:
             if session.run(["command", "-v", "docker", ">/dev/null 2>&1"]):
                 session.run(docker.install_docker())
             if session.run(["command", "-v", "python", ">/dev/null 2>&1"]):
@@ -159,8 +159,8 @@ class Microservice(Target):
                 )
             )
 
-    def run(self, ip_address: str) -> None:
-        with ssh.SSHSession(ip_address) as session:
+    def run(self) -> None:
+        with ssh.SSHSession(self.domain_name) as session:
             session.run(
                 docker.docker_run(
                     {self.application_port: self.application_port},
@@ -172,8 +172,8 @@ class Microservice(Target):
     def debug(self) -> None:
         pass
 
-    def stop(self, ip_address: str) -> None:
-        with ssh.SSHSession(ip_address) as session:
+    def stop(self) -> None:
+        with ssh.SSHSession(self.domain_name) as session:
             session.run(
                 docker.docker_stop(
                     self.target_name,

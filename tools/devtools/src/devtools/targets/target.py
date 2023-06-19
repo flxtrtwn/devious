@@ -30,11 +30,11 @@ class Target(ABC):
         pass
 
     @abstractmethod
-    def deploy(self, ip_address: str) -> None:
+    def deploy(self) -> None:
         pass
 
     @abstractmethod
-    def run(self, ip_address: str) -> None:
+    def run(self) -> None:
         pass
 
     @abstractmethod
@@ -42,5 +42,5 @@ class Target(ABC):
         pass
 
     @abstractmethod
-    def stop(self, ip_address: str) -> None:
+    def stop(self) -> None:
         pass
