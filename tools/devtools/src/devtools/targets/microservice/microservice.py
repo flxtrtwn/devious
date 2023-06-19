@@ -179,7 +179,6 @@ class Microservice(Target):
                     self.target_name,
                 )
             )
-            session.run(["service", "nginx", "stop"])
 
 
 def copy_files_with_substitution(template_dir: Path, target_dir: Path) -> None:
