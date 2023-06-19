@@ -28,19 +28,6 @@ else
 	sudo usermod -aG docker $USER
 fi
 
-if [ -x "$(command -v az)" ]; then
-	echo "Azure CLI already installed."
-else
-	echo "Installing Azure CLI..."
-	sudo apt-get update
-	sudo apt-get install -y ca-certificates curl apt-get-transport-https lsb-release gnupg
-	curl -sL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor | sudo tee /etc/apt-get/trusted.gpg.d/microsoft.gpg >/dev/null
-	AZ_REPO=$(lsb_release -cs)
-	echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $AZ_REPO main" | sudo tee /etc/apt-get/sources.list.d/azure-cli.list
-	sudo apt-get update
-	sudo apt-get install -y azure-cli
-fi
-
 if [ -x "$(command -v git)" ] || [ -x "$(command -v git-lfs)" ] || [ -x "$(command -v wget)" ]; then
 	echo "git, git-lfs and wget already installed."
 else
