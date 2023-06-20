@@ -9,7 +9,7 @@ logger = logging.getLogger()
 
 
 @click.command()
-@click.option("--clean", is_flag=True)
+@click.option("--clean", is_flag=True, default=False)
 @click.option("--target", type=str, required=True)
 def build(
     clean: bool,

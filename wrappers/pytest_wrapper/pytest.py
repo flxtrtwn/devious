@@ -14,7 +14,7 @@ def test_directory(
     coverage: bool = False,
     vis: bool = False,
 ) -> bool:
-    """Test directory with pytest and return if passed, optional coverage."""
+    """Test directory with pytest and indicate failure with True (non-zero), optional coverage."""
     cmd = ["pytest", str(directory)]
     if coverage:
         cmd.extend(
@@ -24,10 +24,10 @@ def test_directory(
                 f"--cov-report=html:{out_dir}",
             ]
         )
-    tests_passed = not subprocess.run(cmd).returncode
+    tests_failed = subprocess.run(cmd).returncode
     if vis and out_dir:
         visual_coverage(out_dir)
-    return tests_passed
+    return bool(tests_failed)
 
 
 def visual_coverage(directory: Path) -> None:

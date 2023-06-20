@@ -84,7 +84,7 @@ class DjangoApp(Target):
             return False
         return True
 
-    def build(self, clean: bool = False) -> None:
+    def build(self, clean: bool) -> None:
         """Build django app as Docker container."""
         if clean:
             shutil.rmtree(self.target_build_dir)  # TODO:, ignore_errors=True)
@@ -115,8 +115,8 @@ class DjangoApp(Target):
                 self.bind_ports,
             )
 
-    def test(self) -> None:
-        pass
+    def test(self, coverage: bool) -> bool:
+        raise NotImplementedError
 
     def deploy(self) -> None:
         subprocess.run([str(self.build_django_manager), "check", "--deploy"])

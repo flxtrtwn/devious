@@ -14,6 +14,7 @@ from devtools.targets.target import Target
 from libs.processing import processing
 from wrappers.docker_wrapper import docker
 from wrappers.linux_wrapper import linux
+from wrappers.pytest_wrapper import pytest
 from wrappers.ssh_wrapper import ssh
 
 MICROSERVICE_CONFIG_DIR = Path(__file__).parent / "microservice_config/"
@@ -80,7 +81,7 @@ class Microservice(Target):
             return False
         return True
 
-    def build(self, clean: bool = False) -> None:
+    def build(self, clean: bool) -> None:
         """Build microservise as Docker container."""
         if clean:
             shutil.rmtree(self.target_build_dir, ignore_errors=True)
@@ -108,8 +109,11 @@ class Microservice(Target):
         if not api_key:
             (self.target_build_dir / "nginx_config" / "api_keys.conf").unlink()
 
-    def test(self) -> None:
-        pass
+    def test(self, coverage: bool) -> bool:
+        coverage_dir = REPO_CONFIG.metrics_dir / "pytest-coverage" / self.target_name
+        return pytest.test_directory(
+            REPO_CONFIG.project_root, out_dir=coverage_dir, coverage=coverage, vis=False
+        )
 
     def deploy(self) -> None:
         with ssh.SSHSession(self.domain_name) as session:

@@ -16,32 +16,32 @@ class Target(ABC):
     @classmethod
     @abstractmethod
     def create(cls, target_name: str) -> None:
-        pass
+        """Create directory structure for target and register it where necessary."""
 
     @abstractmethod
     def validate(self) -> bool:
-        return False
+        """Check if target is consistent with model."""
 
     @abstractmethod
-    def test(self) -> None:
-        pass
+    def test(self, coverage: bool) -> bool:
+        """Run tests for target. Returning non-zero indicates failure."""
 
     @abstractmethod
-    def build(self, clean: bool = False) -> None:
-        pass
+    def build(self, clean: bool) -> None:
+        """Build target."""
 
     @abstractmethod
     def deploy(self) -> None:
-        pass
+        """Deploy target in production."""
 
     @abstractmethod
     def run(self) -> None:
-        pass
+        """Run (deployed) target."""
 
     @abstractmethod
     def debug(self) -> None:
-        pass
+        """Debug target."""
 
     @abstractmethod
     def stop(self) -> None:
-        pass
+        """Stop (deployed) target."""
