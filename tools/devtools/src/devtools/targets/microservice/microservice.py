@@ -114,14 +114,15 @@ class Microservice(Target):
                 session.run(linux.apt_get_install(["nginx"]))
                 session.run(["rm", "/etc/nginx/sites-available/default"])
                 session.run(["rm", "/etc/nginx/sites-enabled/default"])
-            session.run(
-                [
-                    "cp",
-                    "-r",
-                    (self.deployment_dir / "nginx_config").as_posix() + "/.",
-                    "/etc/nginx/",
-                ]
-            )
+            if session.run(["[ -e /etc/nginx/api_backends.conf ]"]):
+                session.run(
+                    [
+                        "cp",
+                        "-r",
+                        (self.deployment_dir / "nginx_config").as_posix() + "/.",
+                        "/etc/nginx/",
+                    ]
+                )
             session.upload(self.target_build_dir, self.deployment_dir)
             session.run(
                 [
@@ -137,19 +138,10 @@ class Microservice(Target):
                 (self.target_build_dir / "api_backend.conf").read_text().split("\n")[0]
             )
             session.run(
-                [
-                    "grep",
-                    "-q",
-                    f"'{api_backend_append_string_first_line}'",
-                    "/etc/nginx/api_backends.conf",
-                    "||",
-                    "cat",
-                    "<<EOT",
-                    ">>",
-                    "/etc/nginx/api_backends.conf",
-                    "\n",
-                    f"{api_backend_append_string}",
-                ]
+                linux.append_to_file_not_contains(
+                    not_contains=api_backend_append_string_first_line,
+                    to_append=api_backend_append_string,
+                )
             )
             session.run(docker.docker_build(self.deployment_dir, self.target_name))
             session.run(
