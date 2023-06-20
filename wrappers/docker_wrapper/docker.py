@@ -42,8 +42,10 @@ def install_docker() -> list[str]:
     )
 
 
-def docker_build(dockerfile_dir: PurePath, app_name: str) -> list[str]:
-    return [
+def docker_build(
+    dockerfile_dir: PurePath, app_name: str, cache: bool = True
+) -> list[str]:
+    docker_build_cmd = [
         "docker",
         "build",
         dockerfile_dir.as_posix(),
@@ -52,6 +54,9 @@ def docker_build(dockerfile_dir: PurePath, app_name: str) -> list[str]:
         "--network",
         "host",
     ]
+    if not cache:
+        docker_build_cmd.extend(["--no-cache"])
+    return docker_build_cmd
 
 
 def docker_compose_build(docker_compose_file: PurePath) -> list[str]:
