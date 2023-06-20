@@ -10,6 +10,7 @@ class Target(ABC):
         self.target_name = target_name
         self.target_dir = REPO_CONFIG.app_dir / self.target_name
         self.target_src_dir = self.target_dir / "src"
+        self.target_tests_dir = self.target_dir / "tests"
         self.target_build_dir = REPO_CONFIG.build_dir / self.target_name
 
     @classmethod

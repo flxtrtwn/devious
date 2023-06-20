@@ -8,6 +8,7 @@ from getpass import getpass
 from pathlib import Path, PurePath
 
 from devtools.config import REPO_CONFIG
+from devtools.targets import util
 from devtools.targets.target import Target
 
 from libs.processing import processing
@@ -46,12 +47,16 @@ class Microservice(Target):
     @classmethod
     def create(cls, target_name: str) -> None:
         target_dir = REPO_CONFIG.app_dir / target_name
+        target_dir.mkdir(parents=True)
+        (target_dir / "requirements.txt").touch()
         target_src_dir = target_dir / "src"
         target_src_dir.mkdir(parents=True)
-        requirements_file = target_dir / "requirements.txt"
-        requirements_file.touch()
         entrypoint = target_src_dir / "main.py"
         entrypoint.write_text(example_main_py())
+        (target_src_dir / "__init__.py").touch()
+        target_tests_dir = target_dir / "tests"
+        target_tests_dir.mkdir(parents=True)
+        util.extend_pythonpath(target_src_dir)
         logger.info(
             "Your target %s was set up, please register it in registered_targets.py.",
             target_name,
