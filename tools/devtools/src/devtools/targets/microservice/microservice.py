@@ -2,6 +2,7 @@ import logging
 import os
 import shutil
 import string
+import subprocess
 import sys
 from getpass import getpass
 from pathlib import Path, PurePath
@@ -40,6 +41,7 @@ class Microservice(Target):
         self.email = email
         self.deployment_dir = deployment_dir
         self.application_port = application_port
+        self.entrypoint = self.target_src_dir / "main.py"
 
     @classmethod
     def create(cls, target_name: str) -> None:
@@ -48,8 +50,8 @@ class Microservice(Target):
         target_src_dir.mkdir(parents=True)
         requirements_file = target_dir / "requirements.txt"
         requirements_file.touch()
-        fastapi_entrypoint = target_src_dir / "main.py"
-        fastapi_entrypoint.write_text(example_main_py())
+        entrypoint = target_src_dir / "main.py"
+        entrypoint.write_text(example_main_py())
         logger.info(
             "Your target %s was set up, please register it in registered_targets.py.",
             target_name,
@@ -162,7 +164,21 @@ class Microservice(Target):
             session.run(["service", "nginx", "start"])
 
     def debug(self) -> None:
-        pass
+        subprocess.run(
+            [
+                "uvicorn",
+                self.entrypoint.relative_to(REPO_CONFIG.project_root)
+                .with_suffix("")
+                .as_posix()
+                .replace("/", ".")
+                + ":app",
+                "--reload",
+                "--reload-dir",
+                self.target_src_dir,
+                "--port",
+                str(self.application_port),
+            ]
+        )
 
     def stop(self) -> None:
         with ssh.SSHSession(self.domain_name) as session:
