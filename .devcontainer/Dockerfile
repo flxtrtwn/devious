@@ -201,9 +201,6 @@ RUN locale-gen en_US.UTF-8 && \
 COPY .devcontainer/.config/.zshrc \
     .devcontainer/.config/.p10k.zsh \
     ${USER_HOME}/
-COPY .devcontainer/.config/git-prompt.sh \
-    ${USER_HOME}/.config/
-RUN chmod +x ${USER_HOME}/.config/git-prompt.sh
 RUN mkdir -p ${USER_HOME}/.config/direnv/
 RUN printf '[whitelist]\nprefix = [ "/workspace" ]\n' > ${USER_HOME}/.config/direnv/config.toml
 RUN chown -R ${USER}:${USER} ${USER_HOME}
