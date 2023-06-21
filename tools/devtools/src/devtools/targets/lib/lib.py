@@ -10,8 +10,8 @@ from wrappers.pytest_wrapper import pytest
 logger = logging.getLogger()
 
 
-class Tool(Target):
-    """Python command line application."""
+class Lib(Target):
+    """Python library."""
 
     def __init__(
         self, target_name: str, base_target_dir: Path, base_build_dir: Path
@@ -20,7 +20,7 @@ class Tool(Target):
 
     @classmethod
     def create(cls, target_name: str) -> None:
-        target_dir = REPO_CONFIG.tool_dir / target_name
+        target_dir = REPO_CONFIG.lib_dir / target_name
         target_dir.mkdir(parents=True)
         (target_dir / "requirements.txt").touch()
         target_src_dir = target_dir / "src"
@@ -33,6 +33,9 @@ class Tool(Target):
             "Your target %s was set up, please register it in registered_targets.py.",
             target_name,
         )
+
+    def verify(self) -> bool:
+        return False
 
     def build(self, clean: bool) -> None:
         raise NotImplementedError
@@ -54,6 +57,3 @@ class Tool(Target):
 
     def stop(self) -> None:
         raise NotImplementedError
-
-    def verify(self) -> bool:
-        return super().verify()

@@ -24,13 +24,15 @@ class DjangoApp(Target):
     def __init__(
         self,
         target_name: str,
+        base_target_dir: Path,
+        base_build_dir: Path,
         domain_name: str,
         email: str,
         bind_ports: dict[int, int],
         application_port: int,
         deployment_dir: PurePath,
     ) -> None:
-        Target.__init__(self, target_name)
+        Target.__init__(self, target_name, base_target_dir, base_build_dir)
         self.app_build_dir = self.target_build_dir / "app"
         self.domain_name = domain_name
         self.email = email
@@ -72,17 +74,18 @@ class DjangoApp(Target):
             target_name,
         )
 
-    def validate(self) -> bool:
+    def verify(self) -> bool:
+        super().verify()
         if not next(
             self.target_dir.glob("requirements.txt"),
             None,  # pyright: ignore [reportGeneralTypeIssues]
         ):
             logger.error("No Python requirements specified.")
-            return False
+            return True
         if not self.target_src_dir.is_dir():
             logger.error("Missing a valid 'src' dir in %s.", self.target_dir)
-            return False
-        return True
+            return True
+        return False
 
     def build(self, clean: bool) -> None:
         """Build django app as Docker container."""
@@ -98,7 +101,7 @@ class DjangoApp(Target):
             )
             sys.exit(1)
 
-        with processing.temp_env(
+        with os_helpers.temp_env(
             app_name=self.target_name,
             exposed_ports=" ".join(
                 str(docker_port) for _, docker_port in self.bind_ports.items()

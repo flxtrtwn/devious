@@ -13,6 +13,7 @@ from devtools.run import run
 from devtools.stop import stop
 from devtools.test import test
 from devtools.update import update
+from devtools.verify import verify
 
 logger = logging.getLogger()
 
@@ -36,3 +37,4 @@ cli.add_command(run)
 cli.add_command(stop)
 cli.add_command(test)
 cli.add_command(update)
+cli.add_command(verify)
