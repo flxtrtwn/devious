@@ -52,14 +52,14 @@ class Microservice(Target):
         target_dir = REPO_CONFIG.app_dir / target_name
         target_dir.mkdir(parents=True)
         (target_dir / "requirements.txt").touch()
-        target_src_dir = target_dir / "src"
+        target_src_dir = target_dir / "src" / target_name
         target_src_dir.mkdir(parents=True)
         entrypoint = target_src_dir / "main.py"
         entrypoint.write_text(example_main_py())
         (target_src_dir / "__init__.py").touch()
         target_tests_dir = target_dir / "tests"
         target_tests_dir.mkdir(parents=True)
-        util.extend_pythonpath(target_src_dir)
+        util.extend_pythonpath(target_src_dir.parent)
         logger.info(
             "Your target %s was set up, please register it in registered_targets.py.",
             target_name,
@@ -180,7 +180,7 @@ class Microservice(Target):
         subprocess.run(
             [
                 "uvicorn",
-                self.entrypoint.relative_to(REPO_CONFIG.project_root)
+                self.entrypoint.relative_to(self.target_src_dir.parent)
                 .with_suffix("")
                 .as_posix()
                 .replace("/", ".")

@@ -10,7 +10,7 @@ class Target(ABC):
     ) -> None:
         self.target_name = target_name
         self.target_dir: Path = base_target_dir / target_name
-        self.target_src_dir: Path = self.target_dir / "src"
+        self.target_src_dir: Path = self.target_dir / "src" / target_name
         self.target_tests_dir: Path = self.target_dir / "tests"
         self.target_build_dir: Path = base_build_dir / self.target_name
 
