@@ -11,7 +11,7 @@ from devtools.config import REPO_CONFIG
 from devtools.targets import util
 from devtools.targets.target import Target
 
-from libs.processing import processing
+from libs.os_helpers import os_helpers
 from wrappers.docker_wrapper import docker
 from wrappers.linux_wrapper import linux
 from wrappers.pytest_wrapper import pytest

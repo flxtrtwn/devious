@@ -10,7 +10,7 @@ import ruamel.yaml
 from devtools.config import REPO_CONFIG
 from devtools.targets.target import Target
 
-from libs.processing import processing
+from libs.os_helpers import os_helpers
 from wrappers.docker_wrapper import docker
 from wrappers.linux_wrapper import linux
 from wrappers.ssh_wrapper import ssh

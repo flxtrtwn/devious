@@ -1,19 +1,13 @@
-"""Utilities for subprocessing."""
+"""OS related convenience utilities."""
 
 import logging
 import multiprocessing
 import os
-import subprocess
 from contextlib import contextmanager
 from timeit import default_timer as timer
 from typing import Any, Callable, Generator, NoReturn
 
 logger = logging.getLogger()
-
-
-def run_commands(commands: list[list[str]]):
-    for command in commands:
-        subprocess.run(command)
 
 
 @contextmanager
