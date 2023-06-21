@@ -193,6 +193,8 @@ RUN curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/in
     && git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting.git "${ZSH_CUSTOM:-"/home/${USER}/.oh-my-zsh/custom"}/plugins/zsh-syntax-highlighting" \
     && git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions "${ZSH_CUSTOM:-"/home/${USER}/.oh-my-zsh/custom"}/plugins/zsh-autosuggestions" \
     && "/home/${USER}/powerlevel10k/gitstatus/install"
+RUN mkdir -p ${USER_HOME}/.local/share/fonts && cd ${USER_HOME}/.local/share/fonts \
+    && curl -fLO https://github.com/ryanoasis/nerd-fonts/raw/HEAD/patched-fonts/DroidSansMono/DroidSansMNerdFont-Regular.otf
 USER root
 RUN locale-gen en_US.UTF-8 && \
     update-locale LANG=en_US.UTF-8
