@@ -1,14 +1,9 @@
 eval "$(direnv hook zsh)"
 
 export ZSH="${HOME}/.oh-my-zsh"
-
 ZSH_THEME="robbyrussell"
-
-plugins=(git zsh-autosuggestions zsh-syntax-highlighting virtualenv bazel)
-
+plugins=(git zsh-autosuggestions zsh-syntax-highlighting)
 source $ZSH/oh-my-zsh.sh
-
-# Set aliases if wanted
 
 alias ls="ls -ph --color=auto"
 export LS_COLORS="di=34:ln=35:so=32:pi=33:ex=1;40:bd=34;40:cd=34;40:su=0;40:sg=0;40:tw=0;40:ow=0;40:"
@@ -24,12 +19,10 @@ source ~/powerlevel10k/powerlevel10k.zsh-theme
 
 HISTFILE=$USER_HOME/.cache/.zsh_history
 
-
 pasteinit() {
   OLD_SELF_INSERT=${${(s.:.)widgets[self-insert]}[2,3]}
   zle -N self-insert url-quote-magic
 }
-
 pastefinish() {
   zle -N self-insert $OLD_SELF_INSERT
 }
