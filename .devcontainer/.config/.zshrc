@@ -1,11 +1,12 @@
+
+eval "$(direnv hook zsh)"
+
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
-
-eval "$(direnv hook zsh)"
 
 export ZSH="${HOME}/.oh-my-zsh"
 plugins=(git zsh-autosuggestions zsh-syntax-highlighting)
@@ -36,8 +37,4 @@ zstyle :bracketed-paste-magic paste-finish pastefinish
 
 if [[ -f "${WORKSPACE_FOLDER}/.devcontainer/.config/.user_aliases" ]]; then
     source "${WORKSPACE_FOLDER}/.devcontainer/.config/.user_aliases"
-fi
-
-if [[ -r "${HOME}/.cache/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-    source "${HOME}/.cache/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
