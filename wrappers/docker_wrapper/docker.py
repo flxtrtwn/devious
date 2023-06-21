@@ -95,7 +95,13 @@ def docker_stop(name: str) -> list[str]:
     return [
         "docker",
         "stop",
-        f'$(docker ps -a -q --filter ancestor={name} --format="{{{{.ID}}}}")',
+        f"$(docker ps -q --filter ancestor={name})",
+    ]
+
+
+def docker_stop_dangling() -> list[str]:
+    return [
+        "for i in $(docker images -q --filter dangling=true) ; do docker container ps -q --filter ancestor=$i ; done | xargs docker stop"
     ]
 
 

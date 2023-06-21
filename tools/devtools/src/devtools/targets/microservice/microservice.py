@@ -200,6 +200,7 @@ class Microservice(Target):
                     self.target_name,
                 )
             )
+            session.run(docker.docker_stop_dangling())
 
 
 def copy_files_with_substitution(template_dir: Path, target_dir: Path) -> None:
