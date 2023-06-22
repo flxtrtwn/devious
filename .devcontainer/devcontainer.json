@@ -44,8 +44,6 @@
                 "terminal.integrated.defaultProfile.linux": "zsh"
             },
             "extensions": [
-                "bbenoist.doxygen",
-                "davidbroetje.algorithm-mnemonics-vscode",
                 "eamodio.gitlens",
                 "esbenp.prettier-vscode",
                 "GitHub.vscode-pull-request-github",
@@ -59,8 +57,7 @@
                 "ms-vscode.test-adapter-converter",
                 "redhat.vscode-yaml",
                 "rubymaniac.vscode-direnv",
-                "timonwong.shellcheck",
-                "trond-snekvik.simple-rst"
+                "timonwong.shellcheck"
             ]
         }
     }
