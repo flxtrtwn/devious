@@ -1,6 +1,4 @@
 
-eval "$(direnv hook zsh)"
-
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
@@ -38,3 +36,5 @@ zstyle :bracketed-paste-magic paste-finish pastefinish
 if [[ -f "${WORKSPACE_FOLDER}/.devcontainer/.config/.user_aliases" ]]; then
     source "${WORKSPACE_FOLDER}/.devcontainer/.config/.user_aliases"
 fi
+
+eval "$(direnv hook zsh)"
