@@ -1,7 +1,4 @@
 version: '3.4'
-volumes:
-    cache:
-        name: cache-${USER}
 services:
     devcontainer:
         build:
@@ -30,3 +27,6 @@ services:
             - ${HOME}/.netrc:/home/${USER}/.netrc
             - ${HOME}/.Xauthority:/home/${USER}/.Xauthority
             - ${HOME}/.ssh/:/home/${USER}/.ssh
+volumes:
+    cache:
+        name: cache-${USER}
