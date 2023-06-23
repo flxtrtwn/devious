@@ -178,6 +178,9 @@ class Microservice(Target):
 
     def debug(self) -> None:
         subprocess.run(
+            ["pip", "install", "-r", (self.target_dir / "requirements.txt").as_posix()]
+        )
+        subprocess.run(
             [
                 "uvicorn",
                 self.entrypoint.relative_to(self.target_src_dir.parent)
