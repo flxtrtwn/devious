@@ -8,3 +8,7 @@ pre-commit install
 git lfs install
 git lfs track "*.png"
 git lfs track "*.jpg"
+
+service udev restart
+
+find /home/$USER/.platformio/packages/contrib-piohome/ -maxdepth 1 -name "main*" -exec sed -i 's#"\\\\":"/"#"/":"/"#g' {} +
