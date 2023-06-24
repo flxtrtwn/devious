@@ -10,6 +10,7 @@ services:
                 UBUNTU_VERSION: ${UBUNTU_VERSION}
                 DOCKER: ${DOCKER}
                 GPP_VERSION: ${GPP_VERSION}
+                EMBEDDED: ${EMBEDDED}
                 CUSTOM_PYTHON_VERSION: ${CUSTOM_PYTHON_VERSION}
         cap_add:
             - SYS_PTRACE
@@ -29,6 +30,7 @@ services:
             - ${HOME}/.ssh/:/home/${USER}/.ssh
             - .vscode-server/extensions/:/root/.vscode-server/extensions/
             - .vscode-server/extensionsCache/:/root/.vscode-server/extensionsCache/
+            - /dev/:/dev/
 volumes:
     cache:
         name: cache-${USER}

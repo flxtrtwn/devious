@@ -57,7 +57,8 @@
                 "ms-vscode.test-adapter-converter",
                 "redhat.vscode-yaml",
                 "rubymaniac.vscode-direnv",
-                "timonwong.shellcheck"
+                "timonwong.shellcheck",
+                "platformio.platformio-ide"
             ]
         }
     }
