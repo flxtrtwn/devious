@@ -19,8 +19,7 @@ if [ ! -x "$(command -v docker)" ]; then
     sudo chmod a+r /etc/apt/keyrings/docker.gpg
 	echo "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
          "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-	sudo apt-get update
-	sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+	sudo apt-get update && sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
     # sudo echo "{"dns":[8.8.8.8]}" > /etc/docker/daemon.json for dns problems, !overwrites daemon.json!
 elif ! docker info >/dev/null 2>&1; then
 	echo "Docker is not running. Starting Docker..."
@@ -40,7 +39,15 @@ if [ -x "$(command -v git)" ] || [ -x "$(command -v git-lfs)" ] || [ -x "$(comma
 	echo "git, git-lfs and wget already installed."
 else
 	echo "Installing git, git lfs and wget..."
-	sudo apt-get install -y git git-lfs wget
+	sudo apt-get update && sudo apt-get install -y git git-lfs wget
+fi
+
+if [ -x "$(command -v usbipd)" ]; then
+    echo "usbipd already installed."
+else
+    echo "Installing usbipd for embedded development"
+    sudo apt-get update && sudo apt-get install -y linux-tools-generic hwdata
+    sudo update-alternatives --install /usr/local/bin/usbip usbip /usr/lib/linux-tools/*-generic/usbip 20
 fi
 
 DEVCONTAINER_GIT_CONFIG=${REPOSITORY_ROOT}/.gitconfig

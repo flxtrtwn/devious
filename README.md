@@ -13,6 +13,7 @@ Currently supports the following application types:
 -   (Optional) Configure devcontainer in .devcontainer/.env file (e.g. Python version).
 -   Create your application with (see "dev create -h")
 -   Register your application in tools/devtools/src/devtools/registered_targets.py (TODO: Possibly automate with user input.)
+-   If you want to go embedded and use WSL2, set up USB support (see https://learn.microsoft.com/en-us/windows/wsl/connect-usb)
 
 ## CONFIGURATION
 
