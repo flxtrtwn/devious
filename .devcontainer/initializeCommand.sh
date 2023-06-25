@@ -72,4 +72,4 @@ else
 	echo "USER=$USER" >>$USER_ENV_FILE
 fi
 
-usbipd.exe wsl attach --busid "$(usbipd.exe wsl list | grep Arduino | cut -d' ' -f1)"
+usbipd.exe wsl attach --busid "$(usbipd.exe wsl list | grep Arduino | cut -d' ' -f1)" || true
