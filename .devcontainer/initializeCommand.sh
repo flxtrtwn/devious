@@ -71,3 +71,5 @@ else
 	echo "Setting User $USER in .user_env file..."
 	echo "USER=$USER" >>$USER_ENV_FILE
 fi
+
+usbipd.exe wsl attach --busid "$(usbipd.exe wsl list | grep Arduino | cut -d' ' -f1)"
