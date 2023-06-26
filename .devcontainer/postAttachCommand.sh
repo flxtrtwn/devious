@@ -9,5 +9,5 @@ git lfs install
 git lfs track "*.png"
 git lfs track "*.jpg"
 
-find /home/$USER/.platformio/packages/contrib-piohome/ -maxdepth 1 -name "main*" -exec sed -i 's#"\\\\":"/"#"/":"/"#g' {} +
-sudo chmod a+rw /dev/ttyACM0
+find /home/$USER/.platformio/packages/contrib-piohome/ -maxdepth 1 -name "main*" -exec sed -i 's#"\\\\":"/"#"/":"/"#g' {} + || true
+sudo chmod a+rw /dev/ttyACM0 || true
