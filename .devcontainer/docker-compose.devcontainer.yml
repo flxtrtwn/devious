@@ -27,6 +27,8 @@ services:
             - ${HOME}/.netrc:/home/${USER}/.netrc
             - ${HOME}/.Xauthority:/home/${USER}/.Xauthority
             - ${HOME}/.ssh/:/home/${USER}/.ssh
+            - .vscode-server/extensions/:/root/.vscode-server/extensions/
+            - .vscode-server/extensionsCache/:/root/.vscode-server/extensionsCache/
 volumes:
     cache:
         name: cache-${USER}
