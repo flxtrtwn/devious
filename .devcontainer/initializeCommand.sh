@@ -73,3 +73,4 @@ else
 fi
 
 usbipd.exe wsl attach --busid "$(usbipd.exe wsl list | grep Arduino | cut -d' ' -f1)" || true
+# .devcontainer/fix_vscode_extension_install.py
