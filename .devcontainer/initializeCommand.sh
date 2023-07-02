@@ -72,5 +72,5 @@ else
 	echo "USER=$USER" >>$USER_ENV_FILE
 fi
 
-usbipd.exe wsl attach --busid "$(usbipd.exe wsl list | grep Arduino | cut -d' ' -f1)" || true
+usbipd.exe wsl attach --busid "$(usbipd.exe wsl list | grep Arduino | cut -d' ' -f1)" || echo "No Arduino devices found"
 # .devcontainer/fix_vscode_extension_install.py
