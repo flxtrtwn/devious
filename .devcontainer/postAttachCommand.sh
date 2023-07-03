@@ -9,6 +9,5 @@ git lfs install
 git lfs track "*.png"
 git lfs track "*.jpg"
 
-python3 .devcontainer/fix_vscode_extension_install.py
-find /home/$USER/.platformio/packages/contrib-piohome/ -maxdepth 1 -name "main*" -exec sed -i 's#"\\\\":"/"#"/":"/"#g' {} + || echo "PlatformIO extension was not loaded when modification was tried"
 sudo chmod a+rw /dev/ttyACM0 || echo "No device on /dev/ttyACM0"
+find /home/$USER/.platformio/packages/contrib-piohome/ -maxdepth 1 -name "main*" -exec sed -i 's#"\\\\":"/"#"/":"/"#g' {} + || echo "PlatformIO extension was not loaded when modification was tried"
