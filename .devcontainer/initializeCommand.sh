@@ -35,16 +35,12 @@ else
 	sudo usermod -aG docker $USER
 fi
 
-if [ -x "$(command -v git)" ] || [ -x "$(command -v git-lfs)" ] || [ -x "$(command -v wget)" ]; then
-	echo "git, git-lfs and wget already installed."
-else
+if [ ! -x "$(command -v git)" ] || [ ! -x "$(command -v git-lfs)" ] || [ ! -x "$(command -v wget)" ]; then
 	echo "Installing git, git lfs and wget..."
 	sudo apt-get update && sudo apt-get install -y git git-lfs wget
 fi
 
-if [ -x "$(command -v usbipd)" ]; then
-    echo "usbipd already installed."
-else
+if [ ! -x "$(command -v usbipd)" ]; then
     echo "Installing usbipd for embedded development"
     sudo apt-get update && sudo apt-get install -y linux-tools-generic hwdata
     sudo update-alternatives --install /usr/local/bin/usbip usbip /usr/lib/linux-tools/*-generic/usbip 20
@@ -65,12 +61,9 @@ else
 fi
 
 USER_ENV_FILE=${REPOSITORY_ROOT}/.devcontainer/.user_env
-if [ "$(tail -n 1 $USER_ENV_FILE)" = "USER=$USER" ]; then
-	echo "User in .user_env file is already set correctly."
-else
+if [ ! "$(tail -n 1 $USER_ENV_FILE)" = "USER=$USER" ]; then
 	echo "Setting User $USER in .user_env file..."
 	echo "USER=$USER" >>$USER_ENV_FILE
 fi
 
-usbipd.exe wsl attach --busid "$(usbipd.exe wsl list | grep Arduino | cut -d' ' -f1)" || echo "No Arduino devices found"
-# .devcontainer/fix_vscode_extension_install.py
+usbipd.exe wsl attach --busid "$(usbipd.exe wsl list | grep Arduino | cut -d' ' -f1)" >/dev/null 2>&1 || echo "No Arduino devices found"
