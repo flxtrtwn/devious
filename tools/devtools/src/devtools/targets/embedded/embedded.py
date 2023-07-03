@@ -5,14 +5,6 @@ from devtools.targets.target import Target
 
 logger = logging.getLogger()
 
-PLATFORMIO_TEMPLATE = """[platformio]
-build_dir = /workspace/build/${APP_NAME}
-[env:release]
-platform = atmelavr
-framework = arduino
-board = megaatmega2560
-"""
-
 
 class Embedded(Target):
     """An embedded target managed with PlatformIO extension."""
