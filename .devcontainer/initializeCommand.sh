@@ -47,7 +47,6 @@ fi
 
 DEVCONTAINER_GIT_CONFIG=${REPOSITORY_ROOT}/.gitconfig
 USER_GIT_CONFIG=~/.gitconfig
-echo cmp $DEVCONTAINER_GIT_CONFIG $USER_GIT_CONFIG
 
 if cmp $DEVCONTAINER_GIT_CONFIG $USER_GIT_CONFIG; then
 	echo ".gitconfig of user $USER is identical to devcontainer .gitconfig."
