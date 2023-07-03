@@ -1,4 +1,5 @@
 import logging
+import string
 from pathlib import Path
 
 from devtools.config import REPO_CONFIG
@@ -6,6 +7,13 @@ from devtools.targets.target import Target
 
 logger = logging.getLogger()
 
+PLATFORMIO_TEMPLATE="""[platformio]
+build_dir = /workspace/build/${APP_NAME}
+[env:release]
+platform = atmelavr
+framework = arduino
+board = megaatmega2560
+"""
 
 class Embedded(Target):
     """An embedded target managed with PlatformIO extension."""
@@ -23,9 +31,12 @@ class Embedded(Target):
     def create(cls, target_name: str) -> None:
         target_dir = REPO_CONFIG.app_dir / target_name
         target_dir.mkdir(parents=True)
-        (target_dir / "requirements.txt").touch()
-        target_tests_dir = target_dir / "tests"
-        target_tests_dir.mkdir(parents=True)
+        platformio_file = (target_dir / "platformio.ini")
+        platformio_file.write_text(string.Template(PLATFORMIO_TEMPLATE).substitute(
+                    {"APP_NAME":target_name}
+                ))
+        # target_tests_dir = target_dir / "tests"
+        # target_tests_dir.mkdir(parents=True)
         logger.info(
             "Your target %s was set up, please register it in registered_targets.py.",
             target_name,
