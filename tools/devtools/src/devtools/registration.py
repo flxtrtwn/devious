@@ -20,5 +20,9 @@ def register_target(target_name: str, target_type: Type[Target]) -> None:
 def from_string(target_type: str) -> Type[Target]:
     return KNOWN_TARGETS[target_type]
 
+def verify_registration() -> bool:
+    target_names = [target.target_name for target in REGISTERED_TARGETS]
+    return len(target_names) != len(set(target_names))
+
 
 KNOWN_TARGETS = {"django-app": DjangoApp, "microservice": Microservice}
