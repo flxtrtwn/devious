@@ -21,11 +21,10 @@ if [ ! -x "$(command -v docker)" ]; then
          "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 	sudo apt-get update && sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
     # sudo echo "{"dns":[8.8.8.8]}" > /etc/docker/daemon.json for dns problems, !overwrites daemon.json!
-elif ! docker info >/dev/null 2>&1; then
+fi
+if ! docker info >/dev/null 2>&1; then
 	echo "Docker is not running. Starting Docker..."
 	sudo service docker start
-else
-	echo "Docker already installed and running."
 fi
 
 if id -nG $USER | grep -qw docker; then
