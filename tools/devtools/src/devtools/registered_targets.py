@@ -5,11 +5,12 @@ from devtools.config import REPO_CONFIG
 from devtools.targets.django_app.django_app import DjangoApp
 from devtools.targets.lib.lib import Lib
 from devtools.targets.microservice.microservice import Microservice
+from devtools.targets.target import Target
 from devtools.targets.tool.tool import Tool
 
 logger = logging.getLogger()
 
-REGISTERED_TARGETS = [
+REGISTERED_TARGETS: list[Target]  = [
     Tool("devtools", REPO_CONFIG.tool_dir, REPO_CONFIG.build_dir),
     Lib("os_helpers", REPO_CONFIG.lib_dir, REPO_CONFIG.build_dir),
 ]

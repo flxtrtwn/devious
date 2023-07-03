@@ -117,6 +117,7 @@ RUN if [ ${DOCKER} == true ]; then \
 ### CPP STAGE ###
 FROM devcontainer_docker AS devcontainer_cpp
 ARG GPP_VERSION
+ARG EMBEDDED
 USER root
 SHELL ["/bin/bash", "-euco", "pipefail"]
 RUN if [ ${GPP_VERSION} != false ]; then \
@@ -129,6 +130,26 @@ RUN if [ ${GPP_VERSION} != false ]; then \
     && update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-${GPP_VERSION} 100 \
     && update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-${GPP_VERSION} 100 \
     && update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-${GPP_VERSION} 100 \
+    ;fi
+RUN if [ ${EMBEDDED} == true ]; then \
+    apt-get update && apt-get install -y --no-install-recommends \
+    bc \
+    sudo \
+    build-essential \
+    ca-certificates \
+    clang \
+    curl \
+    git \
+    python3-dev \
+    python3-distutils \
+    srecord \
+    udev \
+    xz-utils \
+    && apt-get autoremove -y \
+    && apt-get clean -y \
+    && curl -fLo /etc/udev/rules.d/99-platformio-udev.rules --create-dirs \
+    https://raw.githubusercontent.com/platformio/platformio-core/develop/platformio/assets/system/99-platformio-udev.rules \
+    && python3 -c "$(curl -fsSL https://raw.githubusercontent.com/platformio/platformio/develop/scripts/get-platformio.py)" \
     ;fi
 
 ### COMMON DEVELOPMENT TOOLS ###
