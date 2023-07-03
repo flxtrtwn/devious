@@ -1,19 +1,18 @@
 import logging
-import string
 from pathlib import Path
 
-from devtools.config import REPO_CONFIG
 from devtools.targets.target import Target
 
 logger = logging.getLogger()
 
-PLATFORMIO_TEMPLATE="""[platformio]
+PLATFORMIO_TEMPLATE = """[platformio]
 build_dir = /workspace/build/${APP_NAME}
 [env:release]
 platform = atmelavr
 framework = arduino
 board = megaatmega2560
 """
+
 
 class Embedded(Target):
     """An embedded target managed with PlatformIO extension."""
@@ -29,17 +28,9 @@ class Embedded(Target):
 
     @classmethod
     def create(cls, target_name: str) -> None:
-        target_dir = REPO_CONFIG.app_dir / target_name
-        target_dir.mkdir(parents=True)
-        platformio_file = (target_dir / "platformio.ini")
-        platformio_file.write_text(string.Template(PLATFORMIO_TEMPLATE).substitute(
-                    {"APP_NAME":target_name}
-                ))
-        # target_tests_dir = target_dir / "tests"
-        # target_tests_dir.mkdir(parents=True)
-        logger.info(
-            "Your target %s was set up, please register it in registered_targets.py.",
-            target_name,
+        logger.error(
+            'Please use the PlatformIO VSCode extension to create embedded targets in the "apps" directory '
+            "and register it afterwards in registered_targets.py."
         )
 
     def verify(self) -> bool:
@@ -58,7 +49,11 @@ class Embedded(Target):
         logger.info("Please use the PlatformIO VSCode extension for building.")
 
     def test(self, coverage: bool) -> bool:
-        raise NotImplementedError
+        logger.warning(
+            "Target %s was not tested, please test it with the PlatformIO VSCode Extension.",
+            self.target_name,
+        )
+        return False
 
     def deploy(self) -> None:
         logger.info("Please use the PlatformIO extension for deployment.")

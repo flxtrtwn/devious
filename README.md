@@ -13,7 +13,12 @@ Currently supports the following application types:
 -   (Optional) Configure devcontainer in .devcontainer/.env file (e.g. Python version).
 -   Create your application with (see "dev create -h")
 -   Register your application in tools/devtools/src/devtools/registered_targets.py (TODO: Possibly automate with user input.)
--   If you want to go embedded, use the PlatformIO extension after creating the target with `dev create` and (for WSL2) set up USB support (see https://learn.microsoft.com/en-us/windows/wsl/connect-usb)
+
+## EMBEDDED TARGETS
+
+-   Use the PlatformIO extension for target lifecycle and create your target in the `apps/<target_name>` directory
+-   You should still register your target in `registered_targets.py`
+-   Set up USB support if you use WSL2 (see https://learn.microsoft.com/en-us/windows/wsl/connect-usb)
 
 ## CONFIGURATION
 
