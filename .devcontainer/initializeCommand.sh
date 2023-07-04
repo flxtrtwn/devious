@@ -45,6 +45,12 @@ if [ ! -x "$(command -v usbipd)" ]; then
     sudo update-alternatives --install /usr/local/bin/usbip usbip /usr/lib/linux-tools/*-generic/usbip 20
 fi
 
+if [ ! -x "/opt/wsl-sudo/wsl-sudo.py" ]; then
+    echo "Installing wudo for windows admin privileges"
+    sudo git clone https://github.com/Chronial/wsl-sudo.git /opt/wsl-sudo
+    # echo alias wudo=\"python3 /opt/wsl-sudo/wsl-sudo.py\" >> ~/.bash_aliases
+fi
+
 DEVCONTAINER_GIT_CONFIG=${REPOSITORY_ROOT}/.gitconfig
 USER_GIT_CONFIG=~/.gitconfig
 
@@ -64,4 +70,4 @@ if [ ! "$(tail -n 1 $USER_ENV_FILE)" = "USER=$USER" ]; then
 	echo "USER=$USER" >>$USER_ENV_FILE
 fi
 
-usbipd.exe wsl attach --busid "$(usbipd.exe wsl list | grep Arduino | cut -d' ' -f1)" >/dev/null 2>&1 || echo "No Arduino devices found"
+python3 /opt/wsl-sudo/wsl-sudo.py usbipd.exe wsl attach --busid "$(usbipd.exe wsl list | grep -E "Arduino|CP210x" | cut -d' ' -f1)"
