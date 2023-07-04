@@ -70,4 +70,4 @@ if [ ! "$(tail -n 1 $USER_ENV_FILE)" = "USER=$USER" ]; then
 	echo "USER=$USER" >>$USER_ENV_FILE
 fi
 
-python3 /opt/wsl-sudo/wsl-sudo.py usbipd.exe wsl attach --busid "$(usbipd.exe wsl list | grep -E "Arduino|CP210x" | cut -d' ' -f1)"
+python3 /opt/wsl-sudo/wsl-sudo.py usbipd.exe wsl attach --busid "$(usbipd.exe wsl list | grep -E "Arduino|CP210x" | cut -d' ' -f1)" || true
