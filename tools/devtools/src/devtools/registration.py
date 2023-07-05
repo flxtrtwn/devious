@@ -2,7 +2,6 @@ from typing import Type
 
 from devtools.registered_targets import REGISTERED_TARGETS
 from devtools.targets.django_app.django_app import DjangoApp
-from devtools.targets.embedded.embedded import Embedded
 from devtools.targets.microservice.microservice import Microservice
 from devtools.targets.target import Target
 
@@ -26,4 +25,4 @@ def verify_registration() -> bool:
     return len(target_names) != len(set(target_names))
 
 
-KNOWN_TARGETS = {"django-app": DjangoApp, "microservice": Microservice, "embedded": Embedded}
+KNOWN_TARGETS = {"django-app": DjangoApp, "microservice": Microservice}

@@ -10,7 +10,6 @@ services:
                 UBUNTU_VERSION: ${UBUNTU_VERSION}
                 DOCKER: ${DOCKER}
                 GPP_VERSION: ${GPP_VERSION}
-                EMBEDDED: ${EMBEDDED}
                 CUSTOM_PYTHON_VERSION: ${CUSTOM_PYTHON_VERSION}
         cap_add:
             - SYS_PTRACE

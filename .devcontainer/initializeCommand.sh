@@ -39,12 +39,6 @@ if [ ! -x "$(command -v git)" ] || [ ! -x "$(command -v git-lfs)" ] || [ ! -x "$
 	sudo apt-get update && sudo apt-get install -y git git-lfs wget
 fi
 
-if [ ! -x "$(command -v usbipd)" ]; then
-    echo "Installing usbipd for embedded development"
-    sudo apt-get update && sudo apt-get install -y linux-tools-generic hwdata
-    sudo update-alternatives --install /usr/local/bin/usbip usbip /usr/lib/linux-tools/*-generic/usbip 20
-fi
-
 if [ ! -x "/opt/wsl-sudo/wsl-sudo.py" ]; then
     echo "Installing wudo for windows admin privileges"
     sudo git clone https://github.com/Chronial/wsl-sudo.git /opt/wsl-sudo
@@ -69,5 +63,3 @@ if [ ! "$(tail -n 1 $USER_ENV_FILE)" = "USER=$USER" ]; then
 	echo "Setting User $USER in .user_env file..."
 	echo "USER=$USER" >>$USER_ENV_FILE
 fi
-
-python3 /opt/wsl-sudo/wsl-sudo.py usbipd.exe wsl attach --busid "$(usbipd.exe wsl list | grep -E "Arduino|CP210x" | cut -d' ' -f1)" || true
