@@ -1,4 +1,8 @@
 #!/bin/bash
+
+# This script is intended to be run on a non-priviledged user account
+# Machine restart is required to add user to docker group
+
 set -e
 trap "exit" INT
 
