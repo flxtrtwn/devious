@@ -11,7 +11,8 @@ click="^8.1.7"
 regex="^2023.10.3"
 jstyleson="^0.0.2"
 "ruamel.yaml"="^0.18.5"
-wrappers = {path = "../wrappers"}
+wrappers = {path = "../../libs/wrappers"}
+os_helpers = {path = "../../libs/os_helpers"}
 
 # Django Apps
 Django="^4.2.7"
