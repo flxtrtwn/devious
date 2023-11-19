@@ -3,7 +3,7 @@
     email = mail@felixtrautwein.de
 [credential]
     # For WSL2
-    helper = /mnt/c/Program\\ Files/Git/mingw64/bin/git-credential-manager.exe
+    # helper = /mnt/c/Program\\ Files/Git/mingw64/bin/git-credential-manager.exe
 [push]
     default = simple
     recurseSubmodules = check
