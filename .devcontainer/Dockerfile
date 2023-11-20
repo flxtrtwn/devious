@@ -132,7 +132,8 @@ RUN if [ ${GPP_VERSION} != false ]; then \
     ;fi
 
 ### COMMON DEVELOPMENT TOOLS ###
-FROM devcontainer_cpp AS devcontainer_utilities
+FROM devcontainer_cpp AS devcontainer
+ARG USER
 USER root
 SHELL ["/bin/bash", "-euco", "pipefail"]
 RUN --mount=type=cache,target=/var/cache/apt \
@@ -150,17 +151,6 @@ RUN --mount=type=cache,target=/var/cache/apt \
     iproute2 \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
-COPY ../requirements.txt requirements.txt
-RUN pip install --no-cache-dir --ignore-installed -r \
-    requirements.txt \
-    && pipdeptree -w fail \
-    && rm -f requirements.txt
-RUN pipx install poetry
-
-
-### FINAL STAGE ###
-FROM devcontainer_utilities AS devcontainer
-ARG USER
 USER root
 SHELL ["/bin/bash", "-euco", "pipefail"]
 RUN useradd -s /bin/bash -U -m ${USER} && \
@@ -177,7 +167,13 @@ RUN curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/in
     && "/home/${USER}/powerlevel10k/gitstatus/install"
 RUN mkdir -p ${USER_HOME}/.local/share/fonts && cd ${USER_HOME}/.local/share/fonts \
     && curl -fLO https://github.com/ryanoasis/nerd-fonts/raw/HEAD/patched-fonts/DroidSansMono/DroidSansMNerdFont-Regular.otf
-RUN poetry completions bash >> ~/.bash_completion
+COPY ../requirements.txt ${USER_HOME}/requirements.txt
+ENV PATH=$PATH:${USER_HOME}/.local/bin
+RUN pip install --no-cache-dir --ignore-installed -r \
+    ${USER_HOME}/requirements.txt \
+    && pipdeptree -w fail \
+    && rm -f ${USER_HOME}/requirements.txt
+RUN pipx install poetry && poetry completions bash >> ~/.bash_completion
 USER root
 RUN locale-gen en_US.UTF-8 && \
     update-locale LANG=en_US.UTF-8

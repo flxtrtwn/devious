@@ -3,9 +3,11 @@ name = "devcontainer"
 version = "0.1.0"
 description = "Generic development cli for various application types."
 authors = ["Felix Trautwein <mail@felixtrautwein.de>"]
+
 [tool.poetry.dependencies]
 python="^3.10"
 ruff = "^0.1.6"
+devtools = {path = "tools/devtools"}
 
 [tool.ruff]
 line-length = 120

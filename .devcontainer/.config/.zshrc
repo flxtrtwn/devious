@@ -37,4 +37,6 @@ if [[ -f "${WORKSPACE_FOLDER}/.devcontainer/.config/.user_aliases" ]]; then
     source "${WORKSPACE_FOLDER}/.devcontainer/.config/.user_aliases"
 fi
 
+export PATH="/${HOME}/.local/bin:$PATH"
+
 eval "$(direnv hook zsh)"
