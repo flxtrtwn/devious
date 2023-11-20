@@ -132,7 +132,8 @@ RUN if [ ${GPP_VERSION} != false ]; then \
     ;fi
 
 ### COMMON DEVELOPMENT TOOLS ###
-FROM devcontainer_cpp AS devcontainer_utilities
+FROM devcontainer_cpp AS devcontainer
+ARG USER
 USER root
 SHELL ["/bin/bash", "-euco", "pipefail"]
 RUN --mount=type=cache,target=/var/cache/apt \
@@ -150,35 +151,6 @@ RUN --mount=type=cache,target=/var/cache/apt \
     iproute2 \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
-RUN pip install --no-cache-dir --ignore-installed \
-    pytest \
-    pytest-cases \
-    pytest-cov \
-    pylint \
-    pylint-django \
-    pre-commit \
-    pip-licenses \
-    pipdeptree \
-    && pipdeptree -w fail
-COPY ../tools/devtools/requirements.txt requirements.txt
-RUN pip install --no-cache-dir --ignore-installed -r \
-    requirements.txt \
-    && pipdeptree -w fail \
-    && rm -f requirements.txt
-COPY ../tools/devtools/src/devtools/targets/django_app/requirements.txt requirements.txt
-RUN pip install --no-cache-dir --ignore-installed -r \
-    requirements.txt \
-    && pipdeptree -w fail \
-    && rm -f requirements.txt
-COPY ../tools/devtools/src/devtools/targets/microservice/requirements.txt requirements.txt
-RUN pip install --no-cache-dir --ignore-installed -r \
-    requirements.txt \
-    && pipdeptree -w fail \
-    && rm -f requirements.txt
-
-### FINAL STAGE ###
-FROM devcontainer_utilities AS devcontainer
-ARG USER
 USER root
 SHELL ["/bin/bash", "-euco", "pipefail"]
 RUN useradd -s /bin/bash -U -m ${USER} && \
@@ -195,6 +167,8 @@ RUN curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/in
     && "/home/${USER}/powerlevel10k/gitstatus/install"
 RUN mkdir -p ${USER_HOME}/.local/share/fonts && cd ${USER_HOME}/.local/share/fonts \
     && curl -fLO https://github.com/ryanoasis/nerd-fonts/raw/HEAD/patched-fonts/DroidSansMono/DroidSansMNerdFont-Regular.otf
+ENV PATH=$PATH:${USER_HOME}/.local/bin
+RUN curl -sSL https://install.python-poetry.org | python -
 USER root
 RUN locale-gen en_US.UTF-8 && \
     update-locale LANG=en_US.UTF-8

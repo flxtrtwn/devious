@@ -4,7 +4,7 @@ from typing import NoReturn
 
 import pytest
 
-from libs.os_helpers import os_helpers
+from os_helpers import os_helpers
 
 
 def callable_raising_exception() -> NoReturn:

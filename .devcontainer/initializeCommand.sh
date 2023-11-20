@@ -30,6 +30,10 @@ if ! docker info >/dev/null 2>&1; then
 	echo "Docker is not running. Starting Docker..."
 	sudo service docker start
 fi
+if [ ! -x "$(command -v gh)" ]; then
+	echo "GitHub CLI is not installed. Installing Docker..."
+	sudo apt-get update && sudo apt-get install -y gh
+fi
 
 if id -nG $USER | grep -qw docker; then
 	echo "$USER already in docker group."

@@ -1,3 +1,0 @@
-django
-django-bootstrap-v5
-django-theme-soft-design

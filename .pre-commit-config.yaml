@@ -5,11 +5,17 @@ repos:
           - id: check-yaml
           - id: end-of-file-fixer
           - id: trailing-whitespace
+    - repo: https://github.com/astral-sh/ruff-pre-commit
+      rev: v0.1.6
+      hooks:
+          - id: ruff
+            args: [--fix]
+          - id: ruff-format
 
     - repo: local
       hooks:
           - id: test
             name: Execute tests
             language: system
-            entry: direnv exec tools/devtools/dev test
+            entry: poetry run dev test
             pass_filenames: false

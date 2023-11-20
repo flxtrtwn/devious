@@ -11,9 +11,7 @@ logger = logging.getLogger()
 
 
 @contextmanager
-def wait_for_callable(
-    callable_object: Callable[[], NoReturn]
-) -> Generator[None, Any, None]:
+def wait_for_callable(callable_object: Callable[[], NoReturn]) -> Generator[None, Any, None]:
     """Execute code while waiting for a Process based on a Callable to complete."""
     process = multiprocessing.Process(target=callable_object)
     process.start()
@@ -22,15 +20,9 @@ def wait_for_callable(
     finally:
         start_time = timer()
         process.join()
-        logger.debug(
-            "Process %s took %s longer than code in context manager.",
-            callable_object,
-            timer() - start_time,
-        )
+        logger.debug("Process %s took %s longer than code in context manager.", callable_object, timer() - start_time)
         if process.exitcode:
-            raise ValueError(
-                f"Process {callable_object} completed with non-zero exit code."
-            )
+            raise ValueError(f"Process {callable_object} completed with non-zero exit code.")
 
 
 @contextmanager

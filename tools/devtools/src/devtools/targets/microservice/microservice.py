@@ -7,15 +7,15 @@ import sys
 from getpass import getpass
 from pathlib import Path, PurePath
 
-from devtools.config import REPO_CONFIG
-from devtools.targets import util
-from devtools.targets.target import Target
-
-from libs.os_helpers import os_helpers
+from os_helpers import os_helpers
 from wrappers.docker_wrapper import docker
 from wrappers.linux_wrapper import linux
 from wrappers.pytest_wrapper import pytest
 from wrappers.ssh_wrapper import ssh
+
+from devtools.config import REPO_CONFIG
+from devtools.targets import util
+from devtools.targets.target import Target
 
 MICROSERVICE_CONFIG_DIR = Path(__file__).parent / "microservice_config/"
 NGINX_CONFIG_DIR = Path(__file__).parent / "nginx_config/"
@@ -60,10 +60,7 @@ class Microservice(Target):
         target_tests_dir = target_dir / "tests"
         target_tests_dir.mkdir(parents=True)
         util.extend_pythonpath(target_src_dir.parent)
-        logger.info(
-            "Your target %s was set up, please register it in registered_targets.py.",
-            target_name,
-        )
+        logger.info("Your target %s was set up, please register it in registered_targets.py.", target_name)
 
     def verify(self) -> bool:
         if super().verify():
@@ -93,9 +90,7 @@ class Microservice(Target):
             shutil.copytree(self.target_src_dir, self.app_build_dir)
             shutil.copy(self.target_dir / "requirements.txt", self.target_build_dir)
         except FileExistsError:
-            logger.error(
-                "%s exists already. To overwrite, build --clean.", self.target_build_dir
-            )
+            logger.error("%s exists already. To overwrite, build --clean.", self.target_build_dir)
             sys.exit(1)
         api_key = getpass("Enter default API Key or leave empty to leave as is: ")
         with os_helpers.temp_env(
@@ -107,17 +102,13 @@ class Microservice(Target):
             all_caps=True,
         ):
             copy_files_with_substitution(MICROSERVICE_CONFIG_DIR, self.target_build_dir)
-            copy_files_with_substitution(
-                NGINX_CONFIG_DIR, self.target_build_dir / "nginx_config"
-            )
+            copy_files_with_substitution(NGINX_CONFIG_DIR, self.target_build_dir / "nginx_config")
         if not api_key:
             (self.target_build_dir / "nginx_config" / "api_keys.conf").unlink()
 
     def test(self, coverage: bool) -> bool:
         coverage_dir = REPO_CONFIG.metrics_dir / "pytest-coverage" / self.target_name
-        return pytest.test_directory(
-            REPO_CONFIG.project_root, out_dir=coverage_dir, coverage=coverage, vis=False
-        )
+        return pytest.test_directory(REPO_CONFIG.project_root, out_dir=coverage_dir, coverage=coverage, vis=False)
 
     def deploy(self) -> None:
         with ssh.SSHSession(self.domain_name) as session:
@@ -130,63 +121,38 @@ class Microservice(Target):
                 session.run(["rm", "/etc/nginx/sites-available/default"])
                 session.run(["rm", "/etc/nginx/sites-enabled/default"])
             if session.run(["[ -e /etc/nginx/api_backends.conf ]"]):
-                session.run(
-                    [
-                        "cp",
-                        "-r",
-                        (self.deployment_dir / "nginx_config").as_posix() + "/.",
-                        "/etc/nginx/",
-                    ]
-                )
+                session.run(["cp", "-r", (self.deployment_dir / "nginx_config").as_posix() + "/.", "/etc/nginx/"])
             session.upload(self.target_build_dir, self.deployment_dir)
             session.run(
                 [
                     "cp",
-                    (self.deployment_dir / f"api.conf").as_posix(),
+                    (self.deployment_dir / "api.conf").as_posix(),
                     f"/etc/nginx/api_conf.d/api_{self.target_name}.conf",
                 ]
             )
-            api_backend_append_string = (
-                self.target_build_dir / "api_backend.conf"
-            ).read_text()
+            api_backend_append_string = (self.target_build_dir / "api_backend.conf").read_text()
             api_backend_append_string_first_line = (
                 (self.target_build_dir / "api_backend.conf").read_text().split("\n")[0]
             )
             session.run(
                 linux.append_to_file_not_contains(
-                    not_contains=api_backend_append_string_first_line,
-                    to_append=api_backend_append_string,
+                    not_contains=api_backend_append_string_first_line, to_append=api_backend_append_string
                 )
             )
             session.run(docker.docker_build(self.deployment_dir, self.target_name))
-            session.run(
-                set_up_ssl_cert(
-                    domain_name=self.domain_name,
-                    email=self.email,
-                )
-            )
+            session.run(set_up_ssl_cert(domain_name=self.domain_name, email=self.email))
 
     def run(self) -> None:
         with ssh.SSHSession(self.domain_name) as session:
-            session.run(
-                docker.docker_run(
-                    {self.application_port: self.application_port},
-                    self.target_name,
-                )
-            )
+            session.run(docker.docker_run({self.application_port: self.application_port}, self.target_name))
             session.run(["service", "nginx", "start"])
 
     def debug(self) -> None:
-        subprocess.run(
-            ["pip", "install", "-r", (self.target_dir / "requirements.txt").as_posix()]
-        )
+        subprocess.run(["pip", "install", "-r", (self.target_dir / "requirements.txt").as_posix()])
         subprocess.run(
             [
                 "uvicorn",
-                self.entrypoint.relative_to(self.target_src_dir.parent)
-                .with_suffix("")
-                .as_posix()
-                .replace("/", ".")
+                self.entrypoint.relative_to(self.target_src_dir.parent).with_suffix("").as_posix().replace("/", ".")
                 + ":app",
                 "--reload",
                 "--reload-dir",
@@ -198,11 +164,7 @@ class Microservice(Target):
 
     def stop(self) -> None:
         with ssh.SSHSession(self.domain_name) as session:
-            session.run(
-                docker.docker_stop(
-                    self.target_name,
-                )
-            )
+            session.run(docker.docker_stop(self.target_name))
             session.run(docker.docker_stop_dangling())
 
 
@@ -211,19 +173,14 @@ def copy_files_with_substitution(template_dir: Path, target_dir: Path) -> None:
     target_dir.mkdir(parents=True, exist_ok=True)
     for template in template_dir.rglob("*"):
         if template.is_dir():
-            (target_dir / template.relative_to(template_dir)).mkdir(
-                parents=True, exist_ok=True
-            )
+            (target_dir / template.relative_to(template_dir)).mkdir(parents=True, exist_ok=True)
             continue
         (target_dir / template.relative_to(template_dir)).write_text(
             string.Template(template.read_text()).substitute(os.environ)
         )
 
 
-def set_up_ssl_cert(
-    domain_name: str,
-    email: str,
-) -> list[str]:
+def set_up_ssl_cert(domain_name: str, email: str) -> list[str]:
     certbot_cmd = [
         "certbot",
         "--nginx",
