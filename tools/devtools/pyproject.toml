@@ -11,8 +11,6 @@ click="^8.1.7"
 regex="^2023.10.3"
 jstyleson="^0.0.2"
 "ruamel.yaml"="^0.18.5"
-wrappers = {path = "../../libs/wrappers"}
-os_helpers = {path = "../../libs/os_helpers"}
 # Django Apps
 Django="^4.2.7"
 django-bootstrap-v5="^1.0.11"
@@ -21,6 +19,8 @@ django-theme-soft-design="^1.0.10"
 fastapi="^0.104.1"
 uvicorn="^0.24.0.post1"
 gunicorn="^21.2.0"
+# Wrappers
+paramiko="^3.3.1"
 
 [build-system]
 requires = ["poetry>=0.12"]

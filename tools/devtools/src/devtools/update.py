@@ -10,14 +10,19 @@ from typing import Any, Generator
 
 import click
 
-from wrappers.git_wrapper import git
+from devtools.wrappers import git
 
 logger = logging.getLogger()
 
 
 @click.command()
 @click.option("--private-remote", type=str)
-@click.option("--strategy", type=click.Choice(["squash", "merge", "rebase"]), default="squash", help="Set merge strategy for upstream commits.")
+@click.option(
+    "--strategy",
+    type=click.Choice(["squash", "merge", "rebase"]),
+    default="squash",
+    help="Set merge strategy for upstream commits.",
+)
 def update(private_remote: str, strategy: str) -> None:
     """Update dev environment if in a detached private repository. Will pull the latest upstream commits on your branch and push it.
     strategy: The way the update is applied, defaults to having a single squash commit."""

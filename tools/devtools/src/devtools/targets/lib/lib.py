@@ -2,10 +2,9 @@ import logging
 from pathlib import Path
 
 from devtools.config import REPO_CONFIG
-from devtools.targets import util
+from devtools.targets import target
 from devtools.targets.target import Target
-
-from wrappers.pytest_wrapper import pytest
+from devtools.wrappers import pytest
 
 logger = logging.getLogger()
 
@@ -13,9 +12,7 @@ logger = logging.getLogger()
 class Lib(Target):
     """Python library."""
 
-    def __init__(
-        self, target_name: str, base_target_dir: Path, base_build_dir: Path
-    ) -> None:
+    def __init__(self, target_name: str, base_target_dir: Path, base_build_dir: Path) -> None:
         Target.__init__(self, target_name, base_target_dir, base_build_dir)
 
     @classmethod
@@ -28,11 +25,8 @@ class Lib(Target):
         (target_src_dir / "__init__.py").touch()
         target_tests_dir = target_dir / "tests"
         target_tests_dir.mkdir(parents=True)
-        util.extend_pythonpath(target_src_dir)
-        logger.info(
-            "Your target %s was set up, please register it in registered_targets.py.",
-            target_name,
-        )
+        target.extend_pythonpath(target_src_dir)
+        logger.info("Your target %s was set up, please register it in registered_targets.py.", target_name)
 
     def verify(self) -> bool:
         return False
@@ -42,9 +36,7 @@ class Lib(Target):
 
     def test(self, coverage: bool) -> bool:
         coverage_dir = REPO_CONFIG.metrics_dir / "pytest-coverage" / self.target_name
-        return pytest.test_directory(
-            self.target_tests_dir, out_dir=coverage_dir, coverage=coverage, vis=False
-        )
+        return pytest.test_directory(self.target_tests_dir, out_dir=coverage_dir, coverage=coverage, vis=False)
 
     def deploy(self) -> None:
         raise NotImplementedError

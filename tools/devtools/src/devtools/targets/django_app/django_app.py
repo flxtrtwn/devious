@@ -7,13 +7,11 @@ import sys
 from pathlib import Path, PurePath
 
 import ruamel.yaml
+from os_helpers import os_helpers
+
 from devtools.config import REPO_CONFIG
 from devtools.targets.target import Target
-
-from os_helpers import os_helpers
-from wrappers.docker_wrapper import docker
-from wrappers.linux_wrapper import linux
-from wrappers.ssh_wrapper import ssh
+from devtools.wrappers import docker, linux, ssh
 
 APP_CONFIG_DIR = Path(__file__).parent / "config"
 
