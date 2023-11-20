@@ -21,6 +21,10 @@ django-theme-soft-design="^1.0.10"
 fastapi="^0.104.1"
 uvicorn="^0.24.0.post1"
 gunicorn="^21.2.0"
+# Wrappers
+paramiko="^3.3.1"
+
+
 
 [build-system]
 requires = ["poetry>=0.12"]
