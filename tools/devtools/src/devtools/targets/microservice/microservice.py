@@ -7,7 +7,7 @@ import sys
 from getpass import getpass
 from pathlib import Path, PurePath
 
-from os_helpers import os_helpers
+from devtools import utils
 
 from devtools.config import REPO_CONFIG
 from devtools.targets import target
@@ -90,7 +90,7 @@ class Microservice(Target):
             logger.error("%s exists already. To overwrite, build --clean.", self.target_build_dir)
             sys.exit(1)
         api_key = getpass("Enter default API Key or leave empty to leave as is: ")
-        with os_helpers.temp_env(
+        with utils.temp_env(
             target_name=self.target_name,
             application_port=str(self.application_port),
             deployment_dir=self.deployment_dir.as_posix(),

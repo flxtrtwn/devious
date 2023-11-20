@@ -7,8 +7,8 @@ import sys
 from pathlib import Path, PurePath
 
 import ruamel.yaml
-from os_helpers import os_helpers
 
+from devtools import utils
 from devtools.config import REPO_CONFIG
 from devtools.targets.target import Target
 from devtools.wrappers import docker, linux, ssh
@@ -92,7 +92,7 @@ class DjangoApp(Target):
             logger.error("%s exists already. To overwrite, build --clean.", self.target_build_dir)
             sys.exit(1)
 
-        with os_helpers.temp_env(
+        with utils.temp_env(
             app_name=self.target_name,
             exposed_ports=" ".join(str(docker_port) for _, docker_port in self.bind_ports.items()),
             application_port=str(self.application_port),

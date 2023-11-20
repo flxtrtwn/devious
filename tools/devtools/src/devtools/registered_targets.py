@@ -1,3 +1,5 @@
+# ruff: noqa: F401
+
 import logging
 from pathlib import PurePath  # Should be used for specifying remote paths
 
@@ -10,7 +12,4 @@ from devtools.targets.tool.tool import Tool
 
 logger = logging.getLogger()
 
-REGISTERED_TARGETS: list[Target]  = [
-    Tool("devtools", REPO_CONFIG.tool_dir, REPO_CONFIG.build_dir),
-    Lib("os_helpers", REPO_CONFIG.lib_dir, REPO_CONFIG.build_dir),
-]
+REGISTERED_TARGETS: list[Target] = [Tool("devtools", REPO_CONFIG.tool_dir, REPO_CONFIG.build_dir)]

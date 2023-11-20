@@ -3,6 +3,8 @@ name = "devtools"
 version = "0.1.0"
 description = "Generic development cli for various application types."
 authors = ["Felix Trautwein <mail@felixtrautwein.de>"]
+homepage = "http://https://github.com/flxtrtwn/devcontainer"
+license = "MIT"
 
 [tool.poetry.dependencies]
 python = "^3.10"
