@@ -17,5 +17,5 @@ repos:
           - id: test
             name: Execute tests
             language: system
-            entry: poetry run dev test
+            entry: poetry run python -m devious test
             pass_filenames: false

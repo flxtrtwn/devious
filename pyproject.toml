@@ -6,7 +6,7 @@ authors = ["Felix Trautwein <mail@felixtrautwein.de>"]
 
 [tool.poetry.dependencies]
 python="^3.10"
-devtools = {path = "tools/devtools", develop=true}
+devious = {path = "tools/devious", develop=true}
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.1.6"
