@@ -17,5 +17,5 @@ repos:
           - id: test
             name: Execute tests
             language: system
-            entry: direnv exec tools/devtools/dev test
+            entry: poetry run dev test
             pass_filenames: false
