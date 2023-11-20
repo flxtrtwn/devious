@@ -21,15 +21,9 @@ def query_remote(remote_name: str = "origin") -> str | Any:
     query_remote_cmd = ["git", "remote", "show", remote_name]
     completed_process = subprocess.run(query_remote_cmd, capture_output=True, text=True)
     print(str(completed_process.stdout))
-    if match := re.search(
-        r"Push\s+URL: (https://.*?.git)", str(completed_process.stdout)
-    ):
+    if match := re.search(r"Push\s+URL: (https://.*?.git)", str(completed_process.stdout)):
         return match.group(1)
-    raise ValueError(
-        "No remote found, output of %s: %s",
-        query_remote_cmd,
-        str(completed_process.stdout),
-    )
+    raise ValueError("No remote found, output of %s: %s", query_remote_cmd, str(completed_process.stdout))
 
 
 def clone(repo: str, folder: Path = Path("."), bare: bool = False) -> None:
@@ -61,5 +55,8 @@ def pull(remote: str = "origin", branch: str = "main", strategy: str = "merge") 
     pull_cmd.extend([remote, branch])
     subprocess.run(pull_cmd)
 
-def set_default_remote_for_branch(remote_name:str="origin", local_branch_name:str="main", remote_branch_name:str="main") -> None:
+
+def set_default_remote_for_branch(
+    remote_name: str = "origin", local_branch_name: str = "main", remote_branch_name: str = "main"
+) -> None:
     subprocess.run(["git", "push", "-u", remote_name, f"{local_branch_name}:{remote_branch_name}"])

@@ -8,22 +8,11 @@ from pathlib import Path
 logger = logging.getLogger()
 
 
-def test_directory(
-    directory: Path,
-    out_dir: Path | None = None,
-    coverage: bool = False,
-    vis: bool = False,
-) -> bool:
+def test_directory(directory: Path, out_dir: Path | None = None, coverage: bool = False, vis: bool = False) -> bool:
     """Test directory with pytest and indicate failure with True (non-zero), optional coverage."""
     cmd = ["pytest", str(directory)]
     if coverage:
-        cmd.extend(
-            [
-                f"--cov={directory}",
-                "--cov-report=term",
-                f"--cov-report=html:{out_dir}",
-            ]
-        )
+        cmd.extend([f"--cov={directory}", "--cov-report=term", f"--cov-report=html:{out_dir}"])
     tests_failed = subprocess.run(cmd).returncode
     if vis and out_dir:
         visual_coverage(out_dir)

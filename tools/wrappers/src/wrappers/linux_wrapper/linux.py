@@ -9,15 +9,7 @@ def chain_commands(commands: list[list[str]], operator: str = "&&") -> list[str]
 
 
 def apt_get_install(apps: list[str]) -> list[str]:
-    cmd = [
-        "export",
-        "DEBIAN_FRONTEND=noninteractive" "&&" "apt-get",
-        "update",
-        "&&",
-        "apt-get",
-        "install",
-        "--yes",
-    ]
+    cmd = ["export", "DEBIAN_FRONTEND=noninteractive" "&&" "apt-get", "update", "&&", "apt-get", "install", "--yes"]
     cmd.extend(apps)
     return cmd
 

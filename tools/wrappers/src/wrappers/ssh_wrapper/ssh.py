@@ -6,10 +6,9 @@ from getpass import getpass
 from pathlib import Path, PurePath
 
 from devtools import util
+from paramiko import SSHClient, WarningPolicy
 
 logger = logging.getLogger()
-
-from paramiko import SSHClient, WarningPolicy
 
 
 def login(target: str, user: str = "root") -> None:
@@ -43,9 +42,7 @@ class SSHSession:
     def run(self, command: list[str]) -> int:
         command_string = util.stringify(command)
         logger.debug("Running remote command: %s", command_string)
-        _, stdout, stderr = self.client.exec_command(
-            command_string, bufsize=1, get_pty=True
-        )
+        _, stdout, stderr = self.client.exec_command(command_string, bufsize=1, get_pty=True)
         while line := stdout.readline():
             print(line.strip("\n"))
         if returncode := stdout.channel.recv_exit_status():
@@ -63,15 +60,11 @@ class SSHSession:
                 self.run(["mkdir", "-p", dest_dir.as_posix()])
                 for path, dirs, files in os.walk(src):
                     for dir in dirs:
-                        ftp_client.mkdir(
-                            str(dest_dir / Path(path).relative_to(src) / dir)
-                        )
+                        ftp_client.mkdir(str(dest_dir / Path(path).relative_to(src) / dir))
                     for file in files:
                         ftp_client.put(
                             (Path(path) / file).as_posix(),
-                            (
-                                dest_dir / Path(path).relative_to(src) / str(file)
-                            ).as_posix(),
+                            (dest_dir / Path(path).relative_to(src) / str(file)).as_posix(),
                         )
 
 
