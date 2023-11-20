@@ -167,13 +167,8 @@ RUN curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/in
     && "/home/${USER}/powerlevel10k/gitstatus/install"
 RUN mkdir -p ${USER_HOME}/.local/share/fonts && cd ${USER_HOME}/.local/share/fonts \
     && curl -fLO https://github.com/ryanoasis/nerd-fonts/raw/HEAD/patched-fonts/DroidSansMono/DroidSansMNerdFont-Regular.otf
-COPY ../requirements.txt ${USER_HOME}/requirements.txt
 ENV PATH=$PATH:${USER_HOME}/.local/bin
-RUN pip install --no-cache-dir --ignore-installed -r \
-    ${USER_HOME}/requirements.txt \
-    && pipdeptree -w fail \
-    && rm -f ${USER_HOME}/requirements.txt
-RUN pipx install poetry && poetry completions bash >> ~/.bash_completion
+RUN curl -sSL https://install.python-poetry.org | python -
 USER root
 RUN locale-gen en_US.UTF-8 && \
     update-locale LANG=en_US.UTF-8

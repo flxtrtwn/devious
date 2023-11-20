@@ -13,6 +13,9 @@ Currently supports the following application types:
 -   (Optional) Configure devcontainer in .devcontainer/.env file (e.g. Python version).
 -   Create your application with (see "dev create -h")
 -   Register your application in tools/devtools/src/devtools/registered_targets.py (TODO: Possibly automate with user input.)
+-   Under some conditions (e.g. remote container without WSL2), the `initializeCommand.sh` must be executed manually on the target system for the first time
+-   For remote containers via SSH, usage of `ssh-agent` is useful to cache your identities on a system
+    -   Windows: `Get-Service ssh-agent | Set-Service -StartupType Automatic -PassThru | Start-Service`, `start-ssh-agent.cmd`, `ssh-add`
 
 ## CONFIGURATION
 
