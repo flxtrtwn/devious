@@ -10,7 +10,7 @@ import ruamel.yaml
 from devtools.config import REPO_CONFIG
 from devtools.targets.target import Target
 
-from libs.os_helpers import os_helpers
+from os_helpers import os_helpers
 from wrappers.docker_wrapper import docker
 from wrappers.linux_wrapper import linux
 from wrappers.ssh_wrapper import ssh
@@ -50,9 +50,7 @@ class DjangoApp(Target):
         target_dir = REPO_CONFIG.app_dir / target_name
         target_src_dir = target_dir / "src"
         target_src_dir.mkdir(parents=True)
-        subprocess.run(
-            ["django-admin", "startproject", target_name, target_src_dir.as_posix()]
-        )
+        subprocess.run(["django-admin", "startproject", target_name, target_src_dir.as_posix()])
         subprocess.run(["chmod", "+x", (target_src_dir / "manage.py").as_posix()])
         requirements_file = target_dir / "requirements.txt"
         requirements_file.touch()
@@ -69,10 +67,7 @@ class DjangoApp(Target):
             },
             docker_compose_file,
         )
-        logger.info(
-            "Your target %s was set up, please register it in registered_targets.py.",
-            target_name,
-        )
+        logger.info("Your target %s was set up, please register it in registered_targets.py.", target_name)
 
     def verify(self) -> bool:
         super().verify()
@@ -96,27 +91,19 @@ class DjangoApp(Target):
             shutil.copy(self.target_dir / "requirements.txt", self.target_build_dir)
             shutil.copy(self.target_dir / "docker-compose.yaml", self.target_build_dir)
         except FileExistsError:
-            logger.error(
-                "%s exists already. To overwrite, build --clean.", self.target_build_dir
-            )
+            logger.error("%s exists already. To overwrite, build --clean.", self.target_build_dir)
             sys.exit(1)
 
         with os_helpers.temp_env(
             app_name=self.target_name,
-            exposed_ports=" ".join(
-                str(docker_port) for _, docker_port in self.bind_ports.items()
-            ),
+            exposed_ports=" ".join(str(docker_port) for _, docker_port in self.bind_ports.items()),
             application_port=str(self.application_port),
             deployment_dir=self.deployment_dir.as_posix(),
             domain_name=self.domain_name,
             all_caps=True,
         ):
             copy_files_with_substitution(APP_CONFIG_DIR, self.target_build_dir)
-            configure_compose(
-                self.target_build_dir,
-                self.target_name,
-                self.bind_ports,
-            )
+            configure_compose(self.target_build_dir, self.target_name, self.bind_ports)
 
     def test(self, coverage: bool) -> bool:
         raise NotImplementedError
@@ -133,11 +120,7 @@ class DjangoApp(Target):
             session.run(
                 docker.docker_compose_run(
                     self.deployed_docker_compose_yaml,
-                    [
-                        self.target_name,
-                        self.deployed_django_manager.as_posix(),
-                        "migrate",
-                    ],
+                    [self.target_name, self.deployed_django_manager.as_posix(), "migrate"],
                 )
             )
             # session.run( #TODO: Make interactive shells work
@@ -165,45 +148,22 @@ class DjangoApp(Target):
 
     def run(self) -> None:
         with ssh.SSHSession(self.domain_name) as session:
-            session.run(
-                docker.docker_compose_up(
-                    docker_compose_yaml=self.deployed_docker_compose_yaml,
-                )
-            )
+            session.run(docker.docker_compose_up(docker_compose_yaml=self.deployed_docker_compose_yaml))
 
     def debug(self) -> None:
         subprocess.run(
-            [
-                self.dev_django_manager.as_posix(),
-                "makemigrations",
-                "--settings",
-                f"{self.target_name}.debug_settings",
-            ]
+            [self.dev_django_manager.as_posix(), "makemigrations", "--settings", f"{self.target_name}.debug_settings"]
         )
         subprocess.run(
-            [
-                self.dev_django_manager.as_posix(),
-                "migrate",
-                "--settings",
-                f"{self.target_name}.debug_settings",
-            ]
+            [self.dev_django_manager.as_posix(), "migrate", "--settings", f"{self.target_name}.debug_settings"]
         )
         subprocess.run(
-            [
-                self.dev_django_manager.as_posix(),
-                "runserver",
-                "--settings",
-                f"{self.target_name}.debug_settings",
-            ]
+            [self.dev_django_manager.as_posix(), "runserver", "--settings", f"{self.target_name}.debug_settings"]
         )
 
     def stop(self) -> None:
         with ssh.SSHSession(self.domain_name) as session:
-            session.run(
-                docker.docker_compose_stop(
-                    docker_compose_yaml=self.deployed_docker_compose_yaml,
-                )
-            )
+            session.run(docker.docker_compose_stop(docker_compose_yaml=self.deployed_docker_compose_yaml))
 
 
 def copy_files_with_substitution(template_dir: Path, target_dir: Path) -> None:
@@ -211,27 +171,16 @@ def copy_files_with_substitution(template_dir: Path, target_dir: Path) -> None:
     for template in template_dir.glob("*"):
         if template.is_file():
             (target_dir / template.name).write_text(
-                string.Template((template_dir / template.name).read_text()).substitute(
-                    os.environ
-                )
+                string.Template((template_dir / template.name).read_text()).substitute(os.environ)
             )
 
 
-def configure_compose(
-    dir: Path,
-    app_name: str,
-    app_docker_ports: dict[int, int],
-) -> None:
+def configure_compose(dir: Path, app_name: str, app_docker_ports: dict[int, int]) -> None:
     docker_compose_file = dir / "docker-compose.yaml"
     yaml = ruamel.yaml.YAML()
     data = yaml.load(docker_compose_file)
     data["services"][app_name].update(
-        {
-            "ports": [
-                f"{str(host_port)}:{str(docker_port)}"
-                for host_port, docker_port in app_docker_ports.items()
-            ]
-        }
+        {"ports": [f"{str(host_port)}:{str(docker_port)}" for host_port, docker_port in app_docker_ports.items()]}
     )
     yaml.dump(data, docker_compose_file)
 
@@ -245,16 +194,8 @@ def set_up_ssl_cert(
     test_cert: bool = False,
 ) -> list[str]:
     backup_nginx_conf = safe_nginx_conf.parent / "nginx.default.backup"
-    backup_cmd = [
-        "cp",
-        safe_nginx_conf.as_posix(),
-        backup_nginx_conf.as_posix(),
-    ]
-    replacement_cmd = [
-        "cp",
-        unsafe_nginx_conf.as_posix(),
-        safe_nginx_conf.as_posix(),
-    ]
+    backup_cmd = ["cp", safe_nginx_conf.as_posix(), backup_nginx_conf.as_posix()]
+    replacement_cmd = ["cp", unsafe_nginx_conf.as_posix(), safe_nginx_conf.as_posix()]
     set_up_ssl_cert_cmd = [
         "docker",
         "compose",
@@ -277,16 +218,8 @@ def set_up_ssl_cert(
     ]
     if test_cert:
         set_up_ssl_cert_cmd.extend(["--test-cert"])
-    restore_safe_conf_cmd = [
-        "cp",
-        backup_nginx_conf.as_posix(),
-        safe_nginx_conf.as_posix(),
-    ]
-    delete_superfluous_confs_cmd = [
-        "rm",
-        unsafe_nginx_conf.as_posix(),
-        backup_nginx_conf.as_posix(),
-    ]
+    restore_safe_conf_cmd = ["cp", backup_nginx_conf.as_posix(), safe_nginx_conf.as_posix()]
+    delete_superfluous_confs_cmd = ["rm", unsafe_nginx_conf.as_posix(), backup_nginx_conf.as_posix()]
     return linux.chain_commands(
         [
             backup_cmd,
