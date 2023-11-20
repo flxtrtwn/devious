@@ -5,8 +5,9 @@ import subprocess
 from getpass import getpass
 from pathlib import Path, PurePath
 
-from devtools import util
 from paramiko import SSHClient, WarningPolicy
+
+from devtools import utils
 
 logger = logging.getLogger()
 
@@ -40,7 +41,7 @@ class SSHSession:
         self.client.close()
 
     def run(self, command: list[str]) -> int:
-        command_string = util.stringify(command)
+        command_string = utils.stringify(command)
         logger.debug("Running remote command: %s", command_string)
         _, stdout, stderr = self.client.exec_command(command_string, bufsize=1, get_pty=True)
         while line := stdout.readline():

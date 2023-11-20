@@ -8,14 +8,11 @@ from getpass import getpass
 from pathlib import Path, PurePath
 
 from os_helpers import os_helpers
-from wrappers.docker_wrapper import docker
-from wrappers.linux_wrapper import linux
-from wrappers.pytest_wrapper import pytest
-from wrappers.ssh_wrapper import ssh
 
 from devtools.config import REPO_CONFIG
-from devtools.targets import util
+from devtools.targets import target
 from devtools.targets.target import Target
+from devtools.wrappers import docker, linux, pytest, ssh
 
 MICROSERVICE_CONFIG_DIR = Path(__file__).parent / "microservice_config/"
 NGINX_CONFIG_DIR = Path(__file__).parent / "nginx_config/"
@@ -59,7 +56,7 @@ class Microservice(Target):
         (target_src_dir / "__init__.py").touch()
         target_tests_dir = target_dir / "tests"
         target_tests_dir.mkdir(parents=True)
-        util.extend_pythonpath(target_src_dir.parent)
+        target.extend_pythonpath(target_src_dir.parent)
         logger.info("Your target %s was set up, please register it in registered_targets.py.", target_name)
 
     def verify(self) -> bool:

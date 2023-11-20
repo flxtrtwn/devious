@@ -1,1 +1,1 @@
-Directory where applications are created (see `dev create -h`).
+Directory where applications are created (see `dev create --help`).

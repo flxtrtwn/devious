@@ -1,4 +1,5 @@
-"""OS related convenience utilities."""
+"""Simple utility functions for devtools."""
+
 
 import logging
 import multiprocessing
@@ -8,6 +9,10 @@ from timeit import default_timer as timer
 from typing import Any, Callable, Generator, NoReturn
 
 logger = logging.getLogger()
+
+
+def stringify(commands: list[str]) -> str:
+    return " ".join(commands)
 
 
 @contextmanager

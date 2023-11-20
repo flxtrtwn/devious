@@ -1,12 +1,10 @@
 """Install tools (on remote machines)."""
 
 import logging
-from typing import Any
 
 import click
 
-from wrappers.docker_wrapper import docker as docker_wrapper
-from wrappers.ssh_wrapper import ssh
+from devtools.wrappers import docker as docker_wrapper, ssh
 
 logger = logging.getLogger()
 
