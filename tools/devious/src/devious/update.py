@@ -55,7 +55,7 @@ def update(private_remote: str, strategy: str) -> None:
         devcontainer_project.write_text(
             re.sub(
                 r"^devious ?= ?{.+$",
-                'devious = "^0.1.0^"',
+                'devious = "^0.1.0"',
                 devcontainer_project.read_text(encoding="utf-8"),
                 flags=re.MULTILINE,
             )
