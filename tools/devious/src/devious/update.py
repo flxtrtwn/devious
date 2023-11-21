@@ -50,7 +50,6 @@ def update(private_remote: str, strategy: str) -> None:
     devcontainer_repo_folder.mkdir(parents=True, exist_ok=True)
     with switch_dir(devcontainer_repo_folder):
         git.clone(devcontainer_repo_remote)
-        shutil.rmtree("tools/devious")
         shutil.rmtree(".git")
         devcontainer_project = Path("pyproject.toml")
         devcontainer_project.write_text(
@@ -64,7 +63,8 @@ def update(private_remote: str, strategy: str) -> None:
     shutil.copytree(devcontainer_repo_folder, REPO_CONFIG.project_root, dirs_exist_ok=True)
     shutil.rmtree(devcontainer_repo_folder)
     if current_remote == devcontainer_repo_remote:
-        git.add([Path("pyproject.toml"), Path("poetry.lock")])
+        shutil.rmtree("tools/devious")
+        git.add([Path("pyproject.toml"), Path("poetry.lock"), Path("tools/devious")])
         git.commit("Detach from devcontainer_upstream and lock Python environment")
 
 
