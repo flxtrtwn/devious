@@ -1,9 +1,23 @@
 """Wraps git commands."""
 import subprocess
 from pathlib import Path
-from typing import Any
+from typing import Any, Iterable
 
 import regex as re
+
+
+def add(paths: Iterable[Path]):
+    add_cmd = ["git", "add"]
+    for path in paths:
+        add_cmd.append(str(path))
+    subprocess.run(add_cmd)
+
+
+def commit(message: str, no_verify: bool = False):
+    commit_cmd = ["git", "commit", "-m", message]
+    if no_verify:
+        commit_cmd.extend(["--no-verify"])
+    subprocess.run(commit_cmd)
 
 
 def push(remote: str = "origin", force: bool = False, mirror: bool = False) -> None:

@@ -4,6 +4,7 @@ source ${HOME}/.bashrc
 set -euo pipefail
 shopt -s nullglob globstar
 
+poetry update
 poetry install --no-cache
 source $(poetry env info --path)/bin/activate
 
