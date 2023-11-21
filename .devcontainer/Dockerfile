@@ -143,12 +143,13 @@ RUN --mount=type=cache,target=/var/cache/apt \
     direnv \
     doxygen \
     gdb \
+    gh \
+    iproute2 \
     net-tools \
     nmap \
     shellcheck \
     shfmt\
     valgrind \
-    iproute2 \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 USER root
