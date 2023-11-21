@@ -35,13 +35,21 @@ class RepoConfig:
     """Context object class for click.ContextObject obj attribute."""
 
     def __init__(
-        self, project_root: Path, build_dir: Path, tool_dir: Path, lib_dir: Path, app_dir: Path, metrics_dir: Path
+        self,
+        project_root: Path,
+        build_dir: Path,
+        tool_dir: Path,
+        lib_dir: Path,
+        app_dir: Path,
+        registered_targets_path: Path,
+        metrics_dir: Path,
     ) -> None:
         self.project_root = project_root
         self.build_dir = build_dir
         self.tool_dir = tool_dir
         self.lib_dir = lib_dir
         self.app_dir = app_dir
+        self.registered_targets_path = registered_targets_path
         self.metrics_dir = metrics_dir
 
 
@@ -51,5 +59,6 @@ REPO_CONFIG = RepoConfig(
     tool_dir=Path(os.environ["TOOL_DIR"]),
     lib_dir=Path(os.environ["LIB_DIR"]),
     app_dir=Path(os.environ["APP_DIR"]),
+    registered_targets_path=Path(os.environ["REGISTERED_TARGETS"]),
     metrics_dir=Path(os.environ["METRICS_DIR"]),
 )

@@ -28,3 +28,6 @@ fix = true
 unsafe-fixes = true
 format.skip-magic-trailing-comma = true
 lint.isort.combine-as-imports = true
+
+[tool.pylint]
+max-line-length = 120

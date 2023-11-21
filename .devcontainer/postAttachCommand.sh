@@ -4,7 +4,8 @@ source ${HOME}/.bashrc
 set -euo pipefail
 shopt -s nullglob globstar
 
-poetry update --no-cache
+poetry config virtualenvs.in-project true
+poetry install --no-cache
 source $(poetry env info --path)/bin/activate
 
 pre-commit install >/dev/null 2>&1

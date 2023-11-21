@@ -43,9 +43,10 @@
         "editor.codeActionsOnSave": {
             "source.fixAll": true,
             "source.organizeImports": true
-          }
+          },
     },
-    "python.defaultInterpreterPath": "/usr/bin/python",
+    "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+    "python.terminal.activateEnvironment": true,
     "python.analysis.indexing": true,
     "python.analysis.inlayHints.functionReturnTypes": true,
     "python.analysis.typeCheckingMode": "strict",
@@ -54,7 +55,10 @@
     "[restructuredtext]": {
         "editor.tabSize": 4
     },
-    "python.analysis.extraPaths": [
-        "tools/devious/src"
+    "pylint.interpreter": [
+        "${workspaceFolder}/.venv/bin/python"
     ],
+    "python.analysis.autoImportCompletions": true,
+    "python.analysis.autoFormatStrings": true,
+    "pylint.importStrategy": "fromEnvironment",
 }

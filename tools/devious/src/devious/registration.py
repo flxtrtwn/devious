@@ -1,9 +1,13 @@
+import importlib
 from typing import Type
 
-from devious.registered_targets import REGISTERED_TARGETS
+from devious.config import REPO_CONFIG
 from devious.targets.django_app.django_app import DjangoApp
 from devious.targets.microservice.microservice import Microservice
 from devious.targets.target import Target
+
+registered_targets = importlib.import_module("registered_targets", package=str(REPO_CONFIG.registered_targets_path))
+REGISTERED_TARGETS = registered_targets.REGISTERED_TARGETS
 
 
 def find_target(target_name: str) -> Target:

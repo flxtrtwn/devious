@@ -41,4 +41,6 @@ export PATH="/${HOME}/.local/bin:$PATH"
 
 source $(poetry env info --path)/bin/activate
 
+alias devious="python -m devious"
+
 eval "$(direnv hook zsh)"
