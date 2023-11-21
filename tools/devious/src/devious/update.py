@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any, Generator
 
 import click
+import toml
 
 from devious.wrappers import git
 
@@ -45,6 +46,13 @@ def update(private_remote: str, strategy: str) -> None:
             git.remote_add("origin", private_remote)
             with switch_dir(devcontainer_repo_folder):
                 git.clone(devcontainer_repo_remote, bare=True)
+                shutil.rmtree(devcontainer_repo_folder / "tools/devious")
+                devcontainer_project = Path("pyproject.toml")
+                devcontainer_project_toml = toml.loads(devcontainer_project.read_text(encoding="utf-8"))
+                devcontainer_project_toml["tool"]["poetry"]["dependencies"]["devious"] = "^0.1.0"
+                devcontainer_project.write_text(toml.dumps(devcontainer_project), encoding="utf-8")
+                git.add([Path(".")])
+                git.commit("Remove tools/devious folder.")
                 git.push(mirror=True, remote=private_remote)
             shutil.rmtree(devcontainer_repo_folder)
             git.set_default_remote_for_branch()

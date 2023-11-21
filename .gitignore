@@ -7,3 +7,4 @@ __pycache__
 /metrics/
 /.devcontainer/.user_env
 poetry.lock
+dist/
