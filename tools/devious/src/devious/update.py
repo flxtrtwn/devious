@@ -3,6 +3,7 @@
 import logging
 import os
 import shutil
+import subprocess
 import sys
 from contextlib import contextmanager
 from pathlib import Path
@@ -63,6 +64,7 @@ def update(private_remote: str, strategy: str) -> None:
     shutil.copytree(devcontainer_repo_folder, REPO_CONFIG.project_root, dirs_exist_ok=True)
     shutil.rmtree(devcontainer_repo_folder)
     if current_remote == devcontainer_repo_remote:
+        subprocess.run(["poetry", "update"])
         shutil.rmtree("tools/devious")
         git.add([Path("pyproject.toml"), Path("poetry.lock"), Path("tools/devious")])
         git.commit("Detach from devcontainer_upstream and lock Python environment")
