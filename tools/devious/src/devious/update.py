@@ -64,7 +64,8 @@ def update(private_remote: str, strategy: str) -> None:
     shutil.copytree(devcontainer_repo_folder, REPO_CONFIG.project_root, dirs_exist_ok=True)
     shutil.rmtree(devcontainer_repo_folder)
     if current_remote == devcontainer_repo_remote:
-        git.commit("Detach from devcontainer_upstream")
+        git.add([Path("pyproject.toml"), Path("poetry.lock")])
+        git.commit("Detach from devcontainer_upstream and lock Python environment")
 
 
 @contextmanager

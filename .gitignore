@@ -6,5 +6,4 @@ __pycache__
 /build/
 /metrics/
 /.devcontainer/.user_env
-poetry.lock
 dist/
