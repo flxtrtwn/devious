@@ -9,15 +9,16 @@ from pathlib import Path
 from typing import Any, Generator
 
 import click
-import toml
+import regex as re
 
+from devious.config import REPO_CONFIG
 from devious.wrappers import git
 
 logger = logging.getLogger()
 
 
 @click.command()
-@click.option("--private-remote", type=str)
+@click.option("--private-remote", type=str, help="Link to your initialized (private) repository (with .git ending).")
 @click.option(
     "--strategy",
     type=click.Choice(["squash", "merge", "rebase"]),
@@ -25,7 +26,8 @@ logger = logging.getLogger()
     help="Set merge strategy for upstream commits.",
 )
 def update(private_remote: str, strategy: str) -> None:
-    """Update dev environment if in a detached private repository. Will pull the latest upstream commits on your branch and push it.
+    """Update dev environment with latest changes from devcontainer repository.
+    Needs to be used initially to decouple the devcontainer upstream.
     strategy: The way the update is applied, defaults to having a single squash commit."""
 
     devcontainer_repo_remote = "https://github.com/flxtrtwn/devcontainer.git"
@@ -33,31 +35,36 @@ def update(private_remote: str, strategy: str) -> None:
     if current_remote == devcontainer_repo_remote:
         if not click.confirm(
             "Updating your environment will detach it from the upstream remote (flxtrtwn/devcontainer) "
-            "and should only be used for private repositories where forking is not possible. Continue?"
+            "and push it to your set private remote repository. Continue?"
         ):
             sys.exit(0)
         else:
             if not private_remote:
                 logger.error("You need to specify --private-remote for the initial update setup.")
                 sys.exit(1)
-            devcontainer_repo_folder = Path("/tmp/devcontainer")
-            devcontainer_repo_folder.mkdir(parents=True)
-            git.remote_rename("origin", "upstream")
+            git.remote_rename("origin", "devcontainer_upstream")
             git.remote_add("origin", private_remote)
-            with switch_dir(devcontainer_repo_folder):
-                git.clone(devcontainer_repo_remote, bare=True)
-                shutil.rmtree(devcontainer_repo_folder / "tools/devious")
-                devcontainer_project = Path("pyproject.toml")
-                devcontainer_project_toml = toml.loads(devcontainer_project.read_text(encoding="utf-8"))
-                devcontainer_project_toml["tool"]["poetry"]["dependencies"]["devious"] = "^0.1.0"
-                devcontainer_project.write_text(toml.dumps(devcontainer_project), encoding="utf-8")
-                git.add([Path(".")])
-                git.commit("Remove tools/devious folder.")
-                git.push(mirror=True, remote=private_remote)
-            shutil.rmtree(devcontainer_repo_folder)
             git.set_default_remote_for_branch()
-    git.pull(remote="upstream", strategy=strategy)
-    git.push()
+    devcontainer_repo_folder = Path("/tmp/devcontainer_upstream")
+    shutil.rmtree(devcontainer_repo_folder, ignore_errors=True)
+    devcontainer_repo_folder.mkdir(parents=True, exist_ok=True)
+    with switch_dir(devcontainer_repo_folder):
+        git.clone(devcontainer_repo_remote)
+        shutil.rmtree("tools/devious")
+        shutil.rmtree(".git")
+        devcontainer_project = Path("pyproject.toml")
+        devcontainer_project.write_text(
+            re.sub(
+                r"^devious ?= ?{.+$",
+                'devious = "^0.1.0^"',
+                devcontainer_project.read_text(encoding="utf-8"),
+                flags=re.MULTILINE,
+            )
+        )
+    shutil.copytree(devcontainer_repo_folder, REPO_CONFIG.project_root, dirs_exist_ok=True)
+    shutil.rmtree(devcontainer_repo_folder)
+    if current_remote == devcontainer_repo_remote:
+        git.commit("Detach from devcontainer_upstream")
 
 
 @contextmanager
