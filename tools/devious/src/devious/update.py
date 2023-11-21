@@ -42,28 +42,29 @@ def update(private_remote: str, strategy: str) -> None:
             if not private_remote:
                 logger.error("You need to specify --private-remote for the initial update setup.")
                 sys.exit(1)
-            devcontainer_repo_folder = Path("/tmp/devcontainer_upstream")
-            shutil.rmtree(devcontainer_repo_folder, ignore_errors=True)
-            devcontainer_repo_folder.mkdir(parents=True, exist_ok=True)
             git.remote_rename("origin", "devcontainer_upstream")
             git.remote_add("origin", private_remote)
-            with switch_dir(devcontainer_repo_folder):
-                git.clone(devcontainer_repo_remote)
-                shutil.rmtree("tools/devious")
-                shutil.rmtree(".git")
-                devcontainer_project = Path("pyproject.toml")
-                devcontainer_project.write_text(
-                    re.sub(
-                        r"^devious ?= ?{.+$",
-                        'devious = "^0.1.0^"',
-                        devcontainer_project.read_text(encoding="utf-8"),
-                        flags=re.MULTILINE,
-                    )
-                )
-            shutil.copytree(devcontainer_repo_folder, REPO_CONFIG.project_root, dirs_exist_ok=True)
-            shutil.rmtree(devcontainer_repo_folder)
             git.set_default_remote_for_branch()
-            git.commit("Detach from devcontainer_upstream")
+    devcontainer_repo_folder = Path("/tmp/devcontainer_upstream")
+    shutil.rmtree(devcontainer_repo_folder, ignore_errors=True)
+    devcontainer_repo_folder.mkdir(parents=True, exist_ok=True)
+    with switch_dir(devcontainer_repo_folder):
+        git.clone(devcontainer_repo_remote)
+        shutil.rmtree("tools/devious")
+        shutil.rmtree(".git")
+        devcontainer_project = Path("pyproject.toml")
+        devcontainer_project.write_text(
+            re.sub(
+                r"^devious ?= ?{.+$",
+                'devious = "^0.1.0^"',
+                devcontainer_project.read_text(encoding="utf-8"),
+                flags=re.MULTILINE,
+            )
+        )
+    shutil.copytree(devcontainer_repo_folder, REPO_CONFIG.project_root, dirs_exist_ok=True)
+    shutil.rmtree(devcontainer_repo_folder)
+    if current_remote == devcontainer_repo_remote:
+        git.commit("Detach from devcontainer_upstream")
 
 
 @contextmanager
