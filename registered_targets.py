@@ -1,4 +1,7 @@
+"""Configuration file for devious."""
 # ruff: noqa: F401
+# pylint:disable=unused-import
+# pyright: reportUnusedImport=false
 
 import logging
 from pathlib import PurePath  # Should be used for specifying remote paths
