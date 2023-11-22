@@ -61,4 +61,8 @@
     "python.analysis.autoImportCompletions": true,
     "python.analysis.autoFormatStrings": true,
     "pylint.importStrategy": "fromEnvironment",
+    "python.terminal.activateEnvInCurrentTerminal": true,
+    "python.analysis.extraPaths": [
+        "${workspaceFolder}/.venv/lib/python3.10/site-packages"
+    ],
 }
