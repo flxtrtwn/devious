@@ -23,7 +23,7 @@
     "editor.autoClosingQuotes": "beforeWhitespace",
     "editor.autoSurround": "quotes",
     "editor.codeActionsOnSave": {
-        "source.organizeImports": true
+        "source.organizeImports": "explicit"
     },
     "editor.fastScrollSensitivity": 2,
     "editor.hover.delay": 200,
@@ -41,9 +41,9 @@
         "editor.formatOnSave": true,
         "editor.defaultFormatter": "charliermarsh.ruff",
         "editor.codeActionsOnSave": {
-            "source.fixAll": true,
-            "source.organizeImports": true
-          },
+            "source.fixAll": "explicit",
+            "source.organizeImports": "explicit"
+        },
     },
     "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
     "python.terminal.activateEnvironment": true,
