@@ -51,6 +51,7 @@ def update(private_remote: str) -> None:
         shutil.rmtree(".git")
         shutil.rmtree("tools/devious")
         Path("registered_targets.py").unlink()
+        Path("README.md").unlink()
         devious_project = Path("pyproject.toml")
         devious_project.write_text(
             re.sub(
@@ -62,7 +63,8 @@ def update(private_remote: str) -> None:
     shutil.rmtree(devious_repo_folder)
     if current_remote == devious_repo_remote:
         subprocess.run(["poetry", "update"], check=True)
-        git.add([Path("pyproject.toml"), Path("poetry.lock"), Path("tools")])
+        Path("README.md").unlink()
+        git.add([Path("pyproject.toml"), Path("poetry.lock"), Path("tools"), Path("README.md")])
         git.commit("Detach from devious_upstream and lock Python environment")
 
 

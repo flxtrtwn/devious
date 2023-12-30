@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "devious"
-version = "0.2.6"
+version = "0.2.7"
 description = "Generic development cli for various application types."
 authors = ["Felix Trautwein <mail@felixtrautwein.de>"]
 readme = "readme.md"
