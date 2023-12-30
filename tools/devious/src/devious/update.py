@@ -26,10 +26,13 @@ logger = logging.getLogger()
     default="squash",
     help="Set merge strategy for upstream commits.",
 )
-def update(private_remote: str, strategy: str) -> None:
+def update(private_remote: str) -> None:
     """Update dev environment with latest changes from devcontainer repository.
+
     Needs to be used initially to decouple the devcontainer upstream.
-    strategy: The way the update is applied, defaults to having a single squash commit."""
+    The update is a simple file copy from a temporary cloned git repository.
+    It can only add and update but not delete files.
+    """
 
     devcontainer_repo_remote = "https://github.com/flxtrtwn/devcontainer.git"
     current_remote = git.query_remote()
@@ -52,21 +55,22 @@ def update(private_remote: str, strategy: str) -> None:
     with switch_dir(devcontainer_repo_folder):
         git.clone(devcontainer_repo_remote)
         shutil.rmtree(".git")
+        shutil.rmtree("tools/devious")
         devcontainer_project = Path("pyproject.toml")
         devcontainer_project.write_text(
             re.sub(
                 r"^devious ?= ?{.+$",
-                'devious = "^0.1.0"',
+                'devious = "*"',
                 devcontainer_project.read_text(encoding="utf-8"),
                 flags=re.MULTILINE,
-            )
+            ),
+            encoding="utf-8",
         )
     shutil.copytree(devcontainer_repo_folder, REPO_CONFIG.project_root, dirs_exist_ok=True)
     shutil.rmtree(devcontainer_repo_folder)
     if current_remote == devcontainer_repo_remote:
-        subprocess.run(["poetry", "update"])
-        shutil.rmtree("tools/devious")
-        git.add([Path("pyproject.toml"), Path("poetry.lock"), Path("tools/devious")])
+        subprocess.run(["poetry", "update"], check=True)
+        git.add([Path("pyproject.toml"), Path("poetry.lock"), Path("tools")])
         git.commit("Detach from devcontainer_upstream and lock Python environment")
 
 
