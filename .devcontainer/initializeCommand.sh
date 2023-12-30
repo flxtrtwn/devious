@@ -8,7 +8,6 @@ trap "exit" INT
 
 # Make sure current user home contains files needed in devcontainer
 touch ${HOME}/.netrc
-touch ${HOME}/.gitconfig
 touch ${HOME}/.Xauthority
 mkdir -p ~/.ssh
 
@@ -51,19 +50,6 @@ if [ ! -x "/opt/wsl-sudo/wsl-sudo.py" ]; then
     echo "Installing wudo for windows admin privileges"
     sudo git clone https://github.com/Chronial/wsl-sudo.git /opt/wsl-sudo
     # echo alias wudo=\"python3 /opt/wsl-sudo/wsl-sudo.py\" >> ~/.bash_aliases
-fi
-
-DEVCONTAINER_GIT_CONFIG=${REPOSITORY_ROOT}/.gitconfig
-USER_GIT_CONFIG=~/.gitconfig
-
-if cmp $DEVCONTAINER_GIT_CONFIG $USER_GIT_CONFIG; then
-	echo ".gitconfig of user $USER is identical to devcontainer .gitconfig."
-else
-	read -p "Replace .gitconfig of user $USER with the devcontainer .gitconfig? [y/n]: " REPLACE_USER_GIT_CONFIG
-	if [ $REPLACE_USER_GIT_CONFIG = "y" ]; then
-		cp $DEVCONTAINER_GIT_CONFIG $USER_GIT_CONFIG
-		echo "Replaced .gitconfig of user $USER."
-	fi
 fi
 
 USER_ENV_FILE=${REPOSITORY_ROOT}/.devcontainer/.user_env
