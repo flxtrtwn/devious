@@ -104,7 +104,8 @@ class DjangoApp(Target):
             configure_compose(self.target_build_dir, self.target_name, self.bind_ports)
 
     def test(self, coverage: bool) -> bool:
-        raise NotImplementedError
+        # TODO: Implement tests for DjangoApp targets
+        return False
 
     def deploy(self) -> None:
         subprocess.run([str(self.build_django_manager), "check", "--deploy"])
