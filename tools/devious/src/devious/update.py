@@ -20,12 +20,6 @@ logger = logging.getLogger()
 
 @click.command()
 @click.option("--private-remote", type=str, help="Link to your initialized (private) repository (with .git ending).")
-@click.option(
-    "--strategy",
-    type=click.Choice(["squash", "merge", "rebase"]),
-    default="squash",
-    help="Set merge strategy for upstream commits.",
-)
 def update(private_remote: str) -> None:
     """Update dev environment with latest changes from devcontainer repository.
 
