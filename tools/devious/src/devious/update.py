@@ -50,6 +50,7 @@ def update(private_remote: str) -> None:
         git.clone(devcontainer_repo_remote)
         shutil.rmtree(".git")
         shutil.rmtree("tools/devious")
+        Path("registered_targets.py").unlink()
         devcontainer_project = Path("pyproject.toml")
         devcontainer_project.write_text(
             re.sub(
