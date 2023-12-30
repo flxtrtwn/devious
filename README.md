@@ -11,14 +11,15 @@ Currently supports the following application types:
 ## USAGE
 
 -   For usage as private repository, use the `devious update` command instead of syncing the fork, because it is not possible to fork privately due to git intrinsics.
-    This will detach your repository from its remote (the `devcontainer` repo) and remove the `devious` development artifacts to facilitate integration of upstream changes (`devious` changes more rapidly and in a more complex way than the rest and will be fetched from PyPI instead).
--   You can still get updates from the `devcontainer` repo if you leave it configured as additional remote with name `upstream` and subsequently use `devious update`.
+    This detaches your repository from its remote (the `devious` repo), remove the `devious` development artifacts to facilitate integration of upstream changes (`devious` changes more rapidly and in a more complex way than the rest and should be fetched from PyPI instead) and leave the original devious remote configures as `devious_upstream`.
+-   You can still get updates from the rest of the `devious` repo (excluding the `tools/devious` folder) with `devious update`.
 -   (Optional) Configure devcontainer in .devcontainer/.env file (e.g. Python version).
 -   Create your application with (see "dev create -h")
--   Register your application in tools/devious/src/devious/registered_targets.py (TODO: Possibly automate with user input.)
+-   Register your applications in `registered_targets.py`.
 -   Under some conditions (e.g. remote container without WSL2), the `initializeCommand.sh` must be executed manually on the target system for the first time
 -   For remote containers via SSH, usage of `ssh-agent` is useful to cache your identities on a system
-    -   Windows: `Get-Service ssh-agent | Set-Service -StartupType Automatic -PassThru | Start-Service`, `start-ssh-agent.cmd`, `ssh-add`
+    -   Windows: `Get-Service ssh-agent | Set-Service -StartupType Automatic -PassThru | Start-Service`, `start-ssh-agent.cmd`, `ssh-add <private key>`
+    -   Ubuntu: `ssh-agent`, `ssh-add <private key>`
 
 ## CONFIGURATION
 

@@ -1,7 +1,7 @@
 # What is Devious?
 
 Devious is a command line utility to manage the lifecycle of applications in a mono repository.
-It is developed in the context of a VSCode-based development container template (see [devcontainer](https://github.com/flxtrtwn/devcontainer)).
+It is developed in the context of a VSCode-based development container template (see [devious](https://github.com/flxtrtwn/devious)).
 
 # What can I do with Devious?
 
