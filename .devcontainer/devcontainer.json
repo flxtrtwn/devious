@@ -35,10 +35,9 @@
     "customizations": {
         "vscode": {
             "settings": {
-                "terminal.integrated.profiles.linux":{
+                "terminal.integrated.profiles.linux": {
                     "zsh": {
                         "path": "/usr/bin/zsh"
-
                     }
                 },
                 "terminal.integrated.defaultProfile.linux": "zsh"
@@ -57,7 +56,8 @@
                 "redhat.vscode-yaml",
                 "rubymaniac.vscode-direnv",
                 "timonwong.shellcheck",
-                "tamasfe.even-better-toml"
+                "tamasfe.even-better-toml",
+                "rust-lang.rust-analyzer"
             ]
         }
     }
