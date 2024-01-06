@@ -82,6 +82,7 @@ class DjangoApp(Target):
 
     def build(self, clean: bool) -> None:
         """Build django app as Docker container."""
+        subprocess.run(["django-admin", "makemessages", "-l", "de"], cwd=self.target_src_dir, check=True)
         if clean:
             shutil.rmtree(self.target_build_dir)  # TODO:, ignore_errors=True)
         try:
@@ -150,14 +151,16 @@ class DjangoApp(Target):
             session.run(docker.docker_compose_up(docker_compose_yaml=self.deployed_docker_compose_yaml))
 
     def debug(self) -> None:
+        subprocess.run(["django-admin", "makemessages", "-l", "de"], cwd=self.target_src_dir, check=True)
         subprocess.run(
-            [self.dev_django_manager.as_posix(), "makemigrations", "--settings", f"{self.target_name}.debug_settings"]
+            [str(self.dev_django_manager), "makemigrations", "--settings", f"{self.target_name}.debug_settings"],
+            check=True,
         )
         subprocess.run(
-            [self.dev_django_manager.as_posix(), "migrate", "--settings", f"{self.target_name}.debug_settings"]
+            [str(self.dev_django_manager), "migrate", "--settings", f"{self.target_name}.debug_settings"], check=True
         )
         subprocess.run(
-            [self.dev_django_manager.as_posix(), "runserver", "--settings", f"{self.target_name}.debug_settings"]
+            [str(self.dev_django_manager), "runserver", "--settings", f"{self.target_name}.debug_settings"], check=True
         )
 
     def stop(self) -> None:
