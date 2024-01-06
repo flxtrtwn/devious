@@ -19,6 +19,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     curl \
     file \
+    gettext \
     git \
     git-lfs \
     gnupg \
@@ -148,7 +149,7 @@ RUN --mount=type=cache,target=/var/cache/apt \
     net-tools \
     nmap \
     shellcheck \
-    shfmt\
+    shfmt \
     valgrind \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
