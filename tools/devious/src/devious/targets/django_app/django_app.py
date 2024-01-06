@@ -83,6 +83,8 @@ class DjangoApp(Target):
     def build(self, clean: bool) -> None:
         """Build django app as Docker container."""
         subprocess.run(["django-admin", "makemessages", "-l", "de"], cwd=self.target_src_dir, check=True)
+        subprocess.run(["django-admin", "compilemessages"], cwd=self.target_src_dir, check=True)
+
         if clean:
             shutil.rmtree(self.target_build_dir)  # TODO:, ignore_errors=True)
         try:
@@ -152,6 +154,7 @@ class DjangoApp(Target):
 
     def debug(self) -> None:
         subprocess.run(["django-admin", "makemessages", "-l", "de"], cwd=self.target_src_dir, check=True)
+        subprocess.run(["django-admin", "compilemessages"], cwd=self.target_src_dir, check=True)
         subprocess.run(
             [str(self.dev_django_manager), "makemigrations", "--settings", f"{self.target_name}.debug_settings"],
             check=True,
