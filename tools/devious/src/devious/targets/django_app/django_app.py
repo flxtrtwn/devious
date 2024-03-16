@@ -5,7 +5,7 @@ import string
 import subprocess
 import sys
 from pathlib import Path, PurePath
-from typing import Collection, List
+from typing import List
 
 import ruamel.yaml
 
@@ -25,7 +25,7 @@ class DjangoApp(Target):
         target_name: str,
         base_target_dir: Path,
         base_build_dir: Path,
-        domain_names: List[str],
+        domain_name: str,
         email: str,
         bind_ports: dict[int, int],
         application_port: int,
@@ -33,8 +33,7 @@ class DjangoApp(Target):
     ) -> None:
         Target.__init__(self, target_name, base_target_dir, base_build_dir)
         self.app_build_dir = self.target_build_dir / "app"
-        self.domain_names = domain_names
-        self.ssh_domain = self.domain_names[0]
+        self.domain_name = domain_name
         self.email = email
         self.bind_ports = bind_ports
         self.application_port = application_port
@@ -102,7 +101,7 @@ class DjangoApp(Target):
             exposed_ports=" ".join(str(docker_port) for _, docker_port in self.bind_ports.items()),
             application_port=str(self.application_port),
             deployment_dir=self.deployment_dir.as_posix(),
-            domain_name=self.ssh_domain,
+            domain_name=self.domain_name,
             all_caps=True,
         ):
             copy_files_with_substitution(APP_CONFIG_DIR, self.target_build_dir)
@@ -114,7 +113,7 @@ class DjangoApp(Target):
 
     def deploy(self) -> None:
         subprocess.run([str(self.build_django_manager), "check", "--deploy"], check=True)
-        with ssh.SSHSession(self.ssh_domain) as session:
+        with ssh.SSHSession(self.domain_name) as session:
             if session.run(["command", "-v", "docker", ">/dev/null 2>&1"]):
                 session.run(docker.install_docker())
             if session.run(["command", "-v", "python", ">/dev/null 2>&1"]):
@@ -144,14 +143,14 @@ class DjangoApp(Target):
                     docker_compose_yaml=self.deployed_docker_compose_yaml,
                     unsafe_nginx_conf=self.deployment_dir / "nginx.default.unsafe",
                     safe_nginx_conf=self.deployment_dir / "nginx.default",
-                    domain_names=self.domain_names,
+                    domain_name=self.domain_name,
                     email=self.email,
                 )
             )
             # TODO: docker compose run --rm certbot renew as cronjob
 
     def run(self) -> None:
-        with ssh.SSHSession(self.ssh_domain) as session:
+        with ssh.SSHSession(self.domain_name) as session:
             session.run(docker.docker_compose_up(docker_compose_yaml=self.deployed_docker_compose_yaml))
 
     def debug(self) -> None:
@@ -169,7 +168,7 @@ class DjangoApp(Target):
         )
 
     def stop(self) -> None:
-        with ssh.SSHSession(self.ssh_domain) as session:
+        with ssh.SSHSession(self.domain_name) as session:
             session.run(docker.docker_compose_stop(docker_compose_yaml=self.deployed_docker_compose_yaml))
 
 
@@ -196,7 +195,7 @@ def set_up_ssl_cert(
     docker_compose_yaml: PurePath,
     unsafe_nginx_conf: PurePath,
     safe_nginx_conf: PurePath,
-    domain_names: Collection[str],
+    domain_name: str,
     email: str,
     test_cert: bool = False,
 ) -> List[str]:
@@ -220,9 +219,11 @@ def set_up_ssl_cert(
         "--webroot",
         "--webroot-path",
         "/var/www/certbot/",
+        "-d",
+        domain_name,
+        "-d",
+        f"www.{domain_name}",
     ]
-    for domain_name in domain_names:
-        set_up_ssl_cert_cmd.extend(["-d", domain_name])
     if test_cert:
         set_up_ssl_cert_cmd.extend(["--test-cert"])
     restore_safe_conf_cmd = ["cp", str(backup_nginx_conf), str(safe_nginx_conf)]
