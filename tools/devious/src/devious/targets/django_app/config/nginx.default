@@ -2,20 +2,63 @@ upstream app {
     server localhost:${APPLICATION_PORT};
 }
 
+
 server {
-        listen 80 default_server;
-        listen [::]:80 default_server;
-        server_name _;
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    listen 443 ssl http2 default_server;
+    listen [::]:443 ssl http2 default_server;
+
+    server_name _;
+    ssl_reject_handshake on;
+
+    return 444;
+}
+
+server {
+    listen 80;
+    listen [::]:80;
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name www.${DOMAIN_NAME};
+    server_tokens off;
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+
+    ssl_certificate /etc/nginx/ssl/live/${DOMAIN_NAME}/fullchain.pem;
+    ssl_certificate_key /etc/nginx/ssl/live/${DOMAIN_NAME}/privkey.pem;
+    # TODO: Fix ssl settings https://www.sherbers.de/sichere-tls-konfiguration-mit-nginx/
+    ssl_session_cache shared:le_nginx_SSL:10m;
+    ssl_session_timeout 1440m;
+    ssl_session_tickets off;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_prefer_server_ciphers off;
+    ssl_ciphers "ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384";
+    ssl_dhparam /etc/ssl/certs/dhparam.pem;
+    add_header X-Frame-Options DENY;
+
+    return 301 https://${DOMAIN_NAME}$$request_uri;
+}
+
+server {
+        listen 80;
+        listen [::]:80;
+        server_name ${DOMAIN_NAME};
         server_tokens off;
+
         location /.well-known/acme-challenge/ {
             root /var/www/certbot;
         }
+
         return 301 https://$$host$$request_uri;
 }
+
 server {
-    listen 443 ssl http2 default_server;
-    listen [::]:443 ssl http2 default_server;
-    server_name _;
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name ${DOMAIN_NAME};
     server_tokens off;
 
     ssl_certificate /etc/nginx/ssl/live/${DOMAIN_NAME}/fullchain.pem;
