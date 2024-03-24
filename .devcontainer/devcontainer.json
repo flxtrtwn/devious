@@ -57,7 +57,9 @@
                 "rubymaniac.vscode-direnv",
                 "timonwong.shellcheck",
                 "tamasfe.even-better-toml",
-                "rust-lang.rust-analyzer"
+                "rust-lang.rust-analyzer",
+                "msjsdiag.vscode-react-native",
+                "dsznajder.es7-react-js-snippets"
             ]
         }
     }
