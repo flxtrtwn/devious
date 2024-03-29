@@ -1,6 +1,7 @@
 ### BASE STAGE ###
 ARG UBUNTU_VERSION
 FROM ubuntu:${UBUNTU_VERSION} AS devcontainer_base
+ARG USER
 USER root
 SHELL ["/bin/bash", "-euco", "pipefail"]
 ENV DEBIAN_FRONTEND=noninteractive \
@@ -40,6 +41,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     x11-apps \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
+RUN useradd -s /bin/bash -U -m ${USER} && \
+    echo ${USER} ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/${USER} && \
+    chmod 0440 /etc/sudoers.d/${USER}
+USER ${USER}
+ENV USER_HOME=/home/${USER}
+RUN mkdir -p ${USER_HOME}/.cache
+RUN mkdir -p ${USER_HOME}/.config
+RUN chown -R ${USER}:${USER} ${USER_HOME}
 
 ### PYTHON STAGE ###
 FROM devcontainer_base AS devcontainer_python
@@ -135,7 +144,7 @@ RUN if [ ${GPP_VERSION} != false ]; then \
     ;fi
 
 ### COMMON DEVELOPMENT TOOLS ###
-FROM devcontainer_cpp AS devcontainer
+FROM devcontainer_flutter AS devcontainer
 ARG USER
 USER root
 SHELL ["/bin/bash", "-euco", "pipefail"]
@@ -155,15 +164,7 @@ RUN --mount=type=cache,target=/var/cache/apt \
     valgrind \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
-USER root
-SHELL ["/bin/bash", "-euco", "pipefail"]
-RUN useradd -s /bin/bash -U -m ${USER} && \
-    echo ${USER} ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/${USER} && \
-    chmod 0440 /etc/sudoers.d/${USER}
 USER ${USER}
-ENV USER_HOME=/home/${USER}
-RUN mkdir -p ${USER_HOME}/.cache
-RUN mkdir -p ${USER_HOME}/.config
 RUN curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh | sh \
     && git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "/home/${USER}/powerlevel10k" \
     && git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting.git "${ZSH_CUSTOM:-"/home/${USER}/.oh-my-zsh/custom"}/plugins/zsh-syntax-highlighting" \
