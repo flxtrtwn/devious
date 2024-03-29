@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-source ${HOME}/.bashrc
+source "${HOME}"/.bashrc
 
 set -euo pipefail
 shopt -s nullglob globstar
@@ -23,4 +23,4 @@ export PATH=$PATH:/studio-data/platform-tools/
 if [ ! -d "/studio-data/Android" ]; then
   mkdir -p /studio-data/Android
 fi
-sudo chown -R ${USER}:${USER} /studio-data/Android
+sudo chown -R "${USER}":"${USER}" /studio-data/Android
