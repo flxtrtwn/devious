@@ -143,6 +143,73 @@ RUN if [ ${GPP_VERSION} != false ]; then \
     && update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-${GPP_VERSION} 100 \
     ;fi
 
+### FLUTTER STAGE ###
+FROM devcontainer_cpp as devcontainer_flutter
+ARG USER
+# Set environment variables used by the Android SDK
+ENV ANDROID_SDK_HOME /opt/android-sdk-linux
+ENV ANDROID_SDK_ROOT /opt/android-sdk-linux
+ENV ANDROID_HOME /opt/android-sdk-linux
+ENV ANDROID_SDK /opt/android-sdk-linux
+ENV DEBIAN_FRONTEND noninteractive
+USER root
+SHELL ["/bin/bash", "-euco", "pipefail"]
+RUN sudo dpkg --add-architecture i386 \
+    && sudo apt-get update \
+    && sudo apt-get upgrade --yes
+RUN --mount=type=cache,target=/var/cache/apt \
+    apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    git \
+    unzip \
+    xz-utils \
+    zip \
+    libglu1-mesa \
+    libc6:i386 \
+    libncurses5:i386 \
+    libstdc++6:i386 lib32z1 \
+    libbz2-1.0:i386 \
+    # Android Studio
+    build-essential git neovim wget unzip sudo \
+        libc6:i386 libncurses5:i386 libstdc++6:i386 lib32z1 libbz2-1.0:i386 \
+        libxrender1 libxtst6 libxi6 libfreetype6 libxft2 xz-utils vim \
+        qemu qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils libnotify4 libglu1 libqt5widgets5 openjdk-8-jdk openjdk-11-jdk xvfb \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+# RUN groupadd -g 1000 -r ${USER}
+RUN adduser ${USER} libvirt
+RUN adduser ${USER} kvm
+RUN usermod -aG plugdev ${USER}
+RUN mkdir -p /androidstudio-data
+VOLUME /androidstudio-data
+RUN chown ${USER}:${USER} /androidstudio-data
+RUN mkdir -p /studio-data/Android/Sdk \
+    && chown -R ${USER}:${USER} /studio-data/Android
+RUN mkdir -p /studio-data/profile/android \
+    && chown -R ${USER}:${USER} /studio-data/profile
+# COPY provisioning/docker_entrypoint.sh /usr/local/bin/docker_entrypoint.sh
+# COPY provisioning/ndkTests.sh /usr/local/bin/ndkTests.sh
+# RUN chmod +x /usr/local/bin/*
+# COPY provisioning/51-android.rules /etc/udev/rules.d/51-android.rules
+#Install Flutter
+ARG FLUTTER_URL=https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.13.6-stable.tar.xz
+ARG FLUTTER_VERSION=3.13.6
+RUN wget "$FLUTTER_URL" -O flutter.tar.xz
+RUN tar -xvf flutter.tar.xz
+RUN rm flutter.tar.xz
+#Android Studio
+ARG ANDROID_STUDIO_URL=https://redirector.gvt1.com/edgedl/android/studio/ide-zips/2022.3.1.20/android-studio-2022.3.1.20-linux.tar.gz
+ARG ANDROID_STUDIO_VERSION=2022.3.1.20
+RUN wget "$ANDROID_STUDIO_URL" -O android-studio.tar.gz
+RUN tar xzvf android-studio.tar.gz
+RUN rm android-studio.tar.gz
+RUN ln -s /studio-data/profile/AndroidStudio$ANDROID_STUDIO_VERSION .AndroidStudio$ANDROID_STUDIO_VERSION
+RUN ln -s /studio-data/Android Android
+RUN ln -s /studio-data/profile/android .android
+RUN ln -s /studio-data/profile/java .java
+RUN ln -s /studio-data/profile/gradle .gradle
+ENV ANDROID_EMULATOR_USE_SYSTEM_LIBS=1
+
 ### COMMON DEVELOPMENT TOOLS ###
 FROM devcontainer_flutter AS devcontainer
 ARG USER
