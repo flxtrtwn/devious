@@ -1,6 +1,7 @@
 version: '3.4'
 services:
     devcontainer:
+        hostname: devious
         build:
             context: ..
             dockerfile: .devcontainer/Dockerfile
@@ -19,17 +20,19 @@ services:
         tty: true
         environment:
             WORKSPACE_FOLDER: /workspace
+            DISPLAY: :99
         working_dir: /workspace
         volumes:
             - /var/run/docker.sock:/var/run/docker.sock
             - ..:/workspace:cached
             - cache:/home/${USER}/.cache
-            - ${HOME}/.netrc:/home/${USER}/.netrc
-            - ${HOME}/.Xauthority:/home/${USER}/.Xauthority
-            - ${HOME}/.ssh/:/home/${USER}/.ssh
+            - ${HOME}/.netrc:/home/${USER}/.netrc:ro
+            - ${HOME}/.ssh/:/home/${USER}/.ssh:ro
             - .vscode-server/extensions/:/root/.vscode-server/extensions/
             - .vscode-server/extensionsCache/:/root/.vscode-server/extensionsCache/
             - /dev/:/dev/
+            - /tmp/.X11-unix:/tmp/.X11-unix:rw
+            - ${HOME}/.Xauthority.docker:/home/${USER}/.Xauthority
 volumes:
     cache:
         name: cache-${USER}

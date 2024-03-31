@@ -29,6 +29,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     make \
     nano \
     openssh-client \
+    openssh-server \
     sudo \
     unzip \
     vim \
@@ -36,6 +37,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     xz-utils \
     zip \
     zsh \
+    x11-apps \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
