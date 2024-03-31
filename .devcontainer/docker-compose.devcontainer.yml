@@ -36,15 +36,15 @@ services:
             - /tmp/.X11-unix:/tmp/.X11-unix:rw
             - ${HOME}/.Xauthority.docker:/home/${USER}/.Xauthority
             # Android Studio
-            - ./studio-data/profile/AndroidStudio2022.3.1.20:/studio-data/profile/AndroidStudio2022.3.1.20
-            - ./studio-data/Android:/studio-data/Android
-            - ./studio-data/profile/.android:/studio-data/profile/.android
-            - ./studio-data/profile/.java:/studio-data/profile/.java
-            - ./studio-data/profile/.gradle:/studio-data/profile/.gradle
-            - android_studio:/androidstudio-data
+            #-  ./studio-data/profile/AndroidStudio2022.3.1.20:/studio-data/profile/AndroidStudio2022.3.1.20
+            #-  ./studio-data/Android:/studio-data/Android
+            #-  ./studio-data/profile/.android:/studio-data/profile/.android
+            #-  ./studio-data/profile/.java:/studio-data/profile/.java
+            #-  ./studio-data/profile/.gradle:/studio-data/profile/.gradle
+            #-  android_studio:/studio-data
         devices:
             - /dev/bus/usb:/dev/bus/usb
 volumes:
     cache:
         name: cache-${USER}
-    android_studio:
+    #android_studio:
