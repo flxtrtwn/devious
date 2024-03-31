@@ -1,6 +1,6 @@
 # ABOUT
 
-Development environment featuring a development command line application (tools/devious) to develop applications and configure remote machines for deployment.
+_Visual Studio Code_ devcontainer-based development environment configuration, featuring a Python command line application (`tools/devious`) to develop web applications and configure remote machines for deployment.
 Note: `devious` is developed in the context of this project and also available from PyPI.
 
 Currently supports the following application types:
