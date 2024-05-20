@@ -225,6 +225,45 @@ RUN flutter config --no-analytics \
 #COPY flutter-android-emulator.sh /usr/local/bin/flutter-android-emulator
 #ENTRYPOINT [ "/usr/local/bin/entrypoint.sh" ]
 
+USER root
+#Android Studio
+ARG ANDROID_STUDIO_ROOT="/opt/android-studio"
+RUN sudo dpkg --add-architecture i386 \
+    && sudo apt-get update \
+    && sudo apt-get upgrade --yes
+RUN --mount=type=cache,target=/var/cache/apt \
+    apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    git \
+    unzip \
+    xz-utils \
+    zip \
+    libglu1-mesa \
+    libc6:i386 \
+    libncurses5:i386 \
+    libstdc++6:i386 lib32z1 \
+    libbz2-1.0:i386 \
+    # Android Studio
+    build-essential git neovim wget unzip sudo \
+        libc6:i386 libncurses5:i386 libstdc++6:i386 lib32z1 libbz2-1.0:i386 \
+        libxrender1 libxtst6 libxi6 libfreetype6 libxft2 xz-utils vim \
+        qemu qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils libnotify4 libglu1 libqt5widgets5 openjdk-8-jdk openjdk-11-jdk openjdk-17-jdk xvfb \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+# RUN groupadd -g 1000 -r ${USER}
+RUN adduser ${USER} libvirt
+RUN adduser ${USER} kvm
+RUN usermod -aG plugdev ${USER}
+RUN mkdir -p $ANDROID_STUDIO_ROOT
+RUN mkdir -p $ANDROID_STUDIO_ROOT/Android/Sdk
+RUN mkdir -p $ANDROID_STUDIO_ROOT/profile/android
+
+ARG ANDROID_STUDIO_VERSION=2023.2.1.24
+ARG ANDROID_STUDIO_URL=https://r1---sn-h0jeenld.gvt1.com/edgedl/android/studio/ide-zips/${ANDROID_STUDIO_VERSION}/android-studio-${ANDROID_STUDIO_VERSION}-linux.tar.gz
+RUN wget "$ANDROID_STUDIO_URL" -O android-studio.tar.gz && tar xzvf android-studio.tar.gz -C $ANDROID_STUDIO_ROOT && rm android-studio.tar.gz
+RUN chown ${USER}:${USER} $ANDROID_STUDIO_ROOT
+ENV ANDROID_EMULATOR_USE_SYSTEM_LIBS=1
+
 ### COMMON DEVELOPMENT TOOLS ###
 FROM devcontainer_flutter AS devcontainer
 ARG USER
