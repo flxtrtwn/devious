@@ -24,3 +24,5 @@ echo "$(whoami)" | sudo -S chmod 777 /dev/kvm > /dev/null 2>&1
 #   mkdir -p /studio-data/Android
 # fi
 # sudo chown -R "${USER}":"${USER}" /studio-data/Android
+
+yes | flutter doctor --android-licenses || test $? -eq 141

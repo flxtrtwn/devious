@@ -41,7 +41,7 @@ services:
             #-  ./studio-data/profile/.android:/studio-data/profile/.android
             #-  ./studio-data/profile/.java:/studio-data/profile/.java
             #-  ./studio-data/profile/.gradle:/studio-data/profile/.gradle
-            #-  android_studio:/studio-data
+            #-  android_studio:/androidstudio-data
         devices:
             - /dev/bus/usb:/dev/bus/usb
 volumes:
