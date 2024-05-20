@@ -147,67 +147,21 @@ RUN if [ ${GPP_VERSION} != false ]; then \
 FROM devcontainer_cpp as devcontainer_flutter
 ARG USER
 # Set environment variables used by the Android SDK
-ENV ANDROID_SDK_HOME /opt/android-sdk-linux
-ENV ANDROID_SDK_ROOT /opt/android-sdk-linux
-ENV ANDROID_HOME /opt/android-sdk-linux
-ENV ANDROID_SDK /opt/android-sdk-linux
+ENV ANDROID_SDK_HOME /home/$USER/android-sdk-linux
+ENV ANDROID_SDK_ROOT /home/$USER/android-sdk-linux
+ENV ANDROID_HOME /home/$USER/android-sdk-linux
+ENV ANDROID_SDK /home/$USER/android-sdk-linux
 ENV DEBIAN_FRONTEND noninteractive
 USER root
 SHELL ["/bin/bash", "-euco", "pipefail"]
 
-# OLD
-# RUN sudo dpkg --add-architecture i386 \
-#     && sudo apt-get update \
-#     && sudo apt-get upgrade --yes
-# RUN --mount=type=cache,target=/var/cache/apt \
-#     apt-get update && apt-get install -y --no-install-recommends \
-#     curl \
-#     git \
-#     unzip \
-#     xz-utils \
-#     zip \
-#     libglu1-mesa \
-#     libc6:i386 \
-#     libncurses5:i386 \
-#     libstdc++6:i386 lib32z1 \
-#     libbz2-1.0:i386 \
-#     # Android Studio
-#     build-essential git neovim wget unzip sudo \
-#         libc6:i386 libncurses5:i386 libstdc++6:i386 lib32z1 libbz2-1.0:i386 \
-#         libxrender1 libxtst6 libxi6 libfreetype6 libxft2 xz-utils vim \
-#         qemu qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils libnotify4 libglu1 libqt5widgets5 openjdk-8-jdk openjdk-11-jdk openjdk-17-jdk xvfb \
-#     && apt-get clean \
-#     && rm -rf /var/lib/apt/lists/*
-# # RUN groupadd -g 1000 -r ${USER}
-# RUN adduser ${USER} libvirt
-# RUN adduser ${USER} kvm
-# RUN usermod -aG plugdev ${USER}
-# RUN mkdir -p /androidstudio-data
-# VOLUME /androidstudio-data
-# RUN chown ${USER}:${USER} /androidstudio-data
-# RUN mkdir -p /studio-data/Android/Sdk \
-#     && chown -R ${USER}:${USER} /studio-data/Android
-# RUN mkdir -p /studio-data/profile/android \
-#     && chown -R ${USER}:${USER} /studio-data/profile
+
 
 # COPY provisioning/docker_entrypoint.sh /usr/local/bin/docker_entrypoint.sh
 # COPY provisioning/ndkTests.sh /usr/local/bin/ndkTests.sh
 # RUN chmod +x /usr/local/bin/*
 # COPY provisioning/51-android.rules /etc/udev/rules.d/51-android.rules
 
-
-#Android Studio
-# ARG ANDROID_STUDIO_VERSION=2023.2.1.24
-# ARG ANDROID_STUDIO_URL=https://r1---sn-h0jeenld.gvt1.com/edgedl/android/studio/ide-zips/${ANDROID_STUDIO_VERSION}/android-studio-${ANDROID_STUDIO_VERSION}-linux.tar.gz
-# RUN wget "$ANDROID_STUDIO_URL" -O android-studio.tar.gz
-# RUN tar xzvf android-studio.tar.gz
-# RUN rm android-studio.tar.gz
-# RUN ln -s /studio-data/profile/AndroidStudio$ANDROID_STUDIO_VERSION .AndroidStudio$ANDROID_STUDIO_VERSION
-# RUN ln -s /studio-data/Android Android
-# RUN ln -s /studio-data/profile/android .android
-# RUN ln -s /studio-data/profile/java .java
-# RUN ln -s /studio-data/profile/gradle .gradle
-# ENV ANDROID_EMULATOR_USE_SYSTEM_LIBS=1
 
 #ENV JAVA_VERSION="8"
 ENV ANDROID_TOOLS_URL="https://dl.google.com/android/repository/commandlinetools-linux-6858069_latest.zip"
@@ -225,38 +179,46 @@ RUN apt-get update \
   && apt-get install --yes --no-install-recommends openjdk-17-jdk curl unzip sed git bash xz-utils libglvnd0 ssh xauth x11-xserver-utils libpulse0 libxcomposite1 libgl1-mesa-glx sudo \
   && rm -rf /var/lib/apt/lists/*
 
+USER $USER
 # android sdk
 RUN mkdir -p $ANDROID_SDK_ROOT \
-  && mkdir -p /home/$USER/.android \
-  && touch /home/$USER/.android/repositories.cfg \
-  && curl -o android_tools.zip $ANDROID_TOOLS_URL \
-  && unzip -qq -d "$ANDROID_SDK_ROOT" android_tools.zip \
-  && rm android_tools.zip \
+  && mkdir -p $ANDROID_SDK_ROOT/.android \
+  && touch $ANDROID_SDK_ROOT/.android/repositories.cfg \
+  && curl -o $ANDROID_SDK_ROOT/android_tools.zip $ANDROID_TOOLS_URL \
+  && unzip -qq -d "$ANDROID_SDK_ROOT" $ANDROID_SDK_ROOT/android_tools.zip \
+  && rm $ANDROID_SDK_ROOT/android_tools.zip \
   && mkdir -p $ANDROID_SDK_ROOT/cmdline-tools/tools \
   && mv $ANDROID_SDK_ROOT/cmdline-tools/bin $ANDROID_SDK_ROOT/cmdline-tools/tools \
-  && mv $ANDROID_SDK_ROOT/cmdline-tools/lib $ANDROID_SDK_ROOT/cmdline-tools/tools
-#   && yes "y" | sdkmanager "build-tools;$ANDROID_BUILD_TOOLS_VERSION" \
-#   && yes "y" | sdkmanager "platforms;android-$ANDROID_VERSION" \
-#   && yes "y" | sdkmanager "platform-tools" \
-#   && yes "y" | sdkmanager "emulator"
-  #&& yes "y" | sdkmanager "system-images;android-$ANDROID_VERSION;google_apis_playstore;$ANDROID_ARCHITECTURE"
+  && mv $ANDROID_SDK_ROOT/cmdline-tools/lib $ANDROID_SDK_ROOT/cmdline-tools/tools \
+  && echo y | sdkmanager "build-tools;$ANDROID_BUILD_TOOLS_VERSION" \
+  && echo y | sdkmanager "platforms;android-$ANDROID_VERSION" \
+  && echo y | sdkmanager "platform-tools" \
+  && echo y | sdkmanager "emulator" \
+  && echo y | sdkmanager "system-images;android-$ANDROID_VERSION;google_apis_playstore;$ANDROID_ARCHITECTURE" \
+  && echo y | sdkmanager "cmdline-tools;latest"
 
-#Install Flutter
-# ARG FLUTTER_VERSION=3.19.0
-# ARG FLUTTER_URL=https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_${FLUTTER_VERSION}-stable.tar.xz
-# ENV FLUTTER_HOME="/home/$USER/flutter"
-# ENV PATH="$FLUTTER_HOME/bin:$PATH"
-# RUN curl -o flutter.tar.xz $FLUTTER_URL \
-#   && mkdir -p $FLUTTER_HOME \
-#   && tar xf flutter.tar.xz -C /home/$USER \
-#   && rm flutter.tar.xz
-# USER $USER
-# RUN flutter config --no-analytics \
-#   && flutter precache \
-#   && yes "y" | flutter doctor --android-licenses \
-#   && flutter doctor \
-#   && flutter emulators --create \
-#   && flutter update-packages
+USER root
+# android dev dependencies
+RUN apt-get update \
+  && apt-get install --yes --no-install-recommends clang cmake ninja-build \
+  && rm -rf /var/lib/apt/lists/*
+
+USER $USER
+# Install Flutter
+ARG FLUTTER_VERSION=3.19.0
+ARG FLUTTER_URL=https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_${FLUTTER_VERSION}-stable.tar.xz
+ENV FLUTTER_HOME="/home/$USER/flutter"
+ENV PATH="$FLUTTER_HOME/bin:$PATH"
+RUN mkdir -p $FLUTTER_HOME \
+  && curl -o $FLUTTER_HOME/flutter.tar.xz $FLUTTER_URL \
+  && tar xf $FLUTTER_HOME/flutter.tar.xz -C /home/$USER \
+  && rm $FLUTTER_HOME/flutter.tar.xz
+RUN flutter config --no-analytics \
+  && flutter precache \
+  && yes | flutter doctor --android-licenses || test $? -eq 141 \
+  && flutter doctor \
+  && flutter emulators --create \
+  && flutter update-packages
 
 #COPY entrypoint.sh /usr/local/bin/
 #COPY chown.sh /usr/local/bin/
