@@ -204,33 +204,101 @@ def set_up_ssl_cert(domain_name: str, email: str) -> list[str]:
 
 
 def example_main_py():
-    return """from typing import Union
+    return """import asyncio
+import concurrent.futures
+import logging
+from datetime import datetime
+from pathlib import Path
+from typing import Optional
 
-from fastapi import FastAPI
-from pydantic import BaseModel
+import github
+import github.CheckRun
+import pydantic
+import zoneinfo
+from fastapi import FastAPI, Header, HTTPException
+
+try:
+    # test_main is not in production container but can be used for load tests in test container
+    # pylint: disable=unused-import
+    from test import test_main  # noqa F401
+except ImportError:
+    print("PRODUCTION MODE")
+    TEST = False
+else:
+    print("TEST MODE")
+    TEST = True
+
+
+class SomePayload(pydantic.BaseModel):
+    some_string: str
+
+    @pydantic.field_validator("some_string")
+    @classmethod
+    def validate_state(cls, value):
+        if value == "incorrect":
+            logger.debug("Ignoring incorrect value.")
+            raise HTTPException(status_code=406, detail="Incorrect value")
+        return value
+
+class Webhook(pydantic.BaseModel):
+    some_payload: SomePayload
+
+
+logger = util.get_logger()
+logger.setLevel(logging.INFO)
+if TEST:
+    logger.setLevel(logging.DEBUG)
 
 app = FastAPI()
 
+MAX_RETRIES = 10
 
-class Item(BaseModel):
-    name: str
-    price: float
-    is_offer: Union[bool, None] = None
+
+@app.post("/")
+async def bot(webhook: Webhook, x_some_header: str = Header()):
+
+    event = some_header
+
+    supported_events = ["some_event"]
+
+    if event not in supported_events:
+        logger.debug("Unsupported event: %s", event)
+        raise HTTPException(status_code=406)
+
+    logger.info("Handling request with id: %s request_id)
+
+    loop = asyncio.get_running_loop()
+    with concurrent.futures.ProcessPoolExecutor() as pool:
+        try:
+            await loop.run_in_executor(
+                pool,
+                process_event,
+                webhook.some_payload.some_string,
+            )
+        except Exception as exc:
+            logger.exception("Failed to process request with id %s", request_id)
+            raise HTTPException(status_code=500) from exc
+
+    logger.info("Finished request with id %s", request_id)
+    return "ok"
+
+
+def process_event(some_string: str):
+
+    # Some setup code
+
+    retries = 0
+    while retries <= MAX_RETRIES:
+        try:
+            # Some application code
+            return
+        except Exception:
+            logger.exception("Retry handling of event with some string: %s due to unexpected event", some_string)
+            retries += 1
+    raise ValueError(f"Failed to process request for event with some string: {some_string} after {retries} retries.")
 
 
 @app.get("/")
-async def read_root() -> dict[str, str]:
-    return {"Hello": "World"}
-
-
-@app.get("/items/{item_id}")
-async def read_item(
-    item_id: int, q: Union[str, None] = None
-) -> dict[str, int | str | None]:
-    return {"item_id": item_id, "q": q}
-
-
-@app.put("/items/{item_id}")
-async def update_item(item_id: int, item: Item) -> dict[str, str | int]:
-    return {"item_name": item.name, "item_id": item_id}
+async def alive():
+    return "ok"
 """
