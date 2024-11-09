@@ -54,6 +54,9 @@ class DjangoApp(Target):
         requirements_file = target_dir / "requirements.txt"
         requirements_file.touch()
         docker_compose_file = target_dir / "docker-compose.yaml"
+        sqlite_db = target_dir / "test" / "db.sqlite3"
+        sqlite_db.parent.mkdir()
+        sqlite_db.touch()
         ruamel.yaml.YAML().dump(
             {
                 "services": {
