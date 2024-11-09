@@ -1,5 +1,9 @@
-# 0.6.1 (2024-11-9)
+# 0.7.0 (2024-11-9)
 
-# Bugfixes
+## Features
+
+-   Improvements for microservices main module
+
+## Bugfixes
 
 -   Sqlite DB is created on `create` for Django projects
