@@ -51,9 +51,13 @@ class DjangoApp(Target):
         target_src_dir.mkdir(parents=True)
         subprocess.run(["django-admin", "startproject", target_name, str(target_src_dir)], check=True)
         subprocess.run(["chmod", "+x", str((target_src_dir / "manage.py"))], check=True)
+        shutil.copy(APP_CONFIG_DIR / "debug_settings.py", target_src_dir / target_name)
         requirements_file = target_dir / "requirements.txt"
         requirements_file.touch()
         docker_compose_file = target_dir / "docker-compose.yaml"
+        sqlite_db = target_dir / "test" / "db.sqlite3"
+        sqlite_db.parent.mkdir()
+        sqlite_db.touch()
         ruamel.yaml.YAML().dump(
             {
                 "services": {
