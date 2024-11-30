@@ -168,6 +168,10 @@ class DjangoApp(Target):
             [str(self.dev_django_manager), "migrate", "--settings", f"{self.target_name}.debug_settings"], check=True
         )
         subprocess.run(
+            [str(self.dev_django_manager), "createsuperuser", "--settings", f"{self.target_name}.debug_settings"],
+            check=True,
+        )
+        subprocess.run(
             [str(self.dev_django_manager), "runserver", "--settings", f"{self.target_name}.debug_settings"], check=True
         )
 
