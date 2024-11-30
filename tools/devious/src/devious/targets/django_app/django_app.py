@@ -49,6 +49,7 @@ class DjangoApp(Target):
         target_dir = REPO_CONFIG.app_dir / target_name
         target_src_dir = target_dir / "src"
         target_src_dir.mkdir(parents=True)
+        dev_django_manager = target_src_dir / "manage.py"
         subprocess.run(["django-admin", "startproject", target_name, str(target_src_dir)], check=True)
         subprocess.run(["chmod", "+x", str((target_src_dir / "manage.py"))], check=True)
         shutil.copy(APP_CONFIG_DIR / "debug_settings.py", target_src_dir / target_name)
@@ -58,6 +59,18 @@ class DjangoApp(Target):
         sqlite_db = target_dir / "test" / "db.sqlite3"
         sqlite_db.parent.mkdir()
         sqlite_db.touch()
+        subprocess.run(["django-admin", "makemessages", "-l", "de"], cwd=target_src_dir, check=True)
+        subprocess.run(["django-admin", "compilemessages"], cwd=target_src_dir, check=True)
+        subprocess.run(
+            [str(dev_django_manager), "makemigrations", "--settings", f"{target_name}.debug_settings"], check=True
+        )
+        subprocess.run([str(dev_django_manager), "migrate", "--settings", f"{target_name}.debug_settings"], check=True)
+        subprocess.run(
+            [str(dev_django_manager), "createsuperuser", "--settings", f"{target_name}.debug_settings"], check=True
+        )
+        subprocess.run(
+            [str(dev_django_manager), "runserver", "--settings", f"{target_name}.debug_settings"], check=True
+        )
         ruamel.yaml.YAML().dump(
             {
                 "services": {
@@ -166,10 +179,6 @@ class DjangoApp(Target):
         )
         subprocess.run(
             [str(self.dev_django_manager), "migrate", "--settings", f"{self.target_name}.debug_settings"], check=True
-        )
-        subprocess.run(
-            [str(self.dev_django_manager), "createsuperuser", "--settings", f"{self.target_name}.debug_settings"],
-            check=True,
         )
         subprocess.run(
             [str(self.dev_django_manager), "runserver", "--settings", f"{self.target_name}.debug_settings"], check=True

@@ -1,3 +1,9 @@
+# 0.8.1 (2024-11-9)
+
+## Bugfix
+
+-   (django-app) Create superuser for test db on app creation, not on app debug
+
 # 0.8.0 (2024-11-9)
 
 ## Features
