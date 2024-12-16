@@ -50,6 +50,7 @@ RUN mkdir -p ${USER_HOME}/.cache
 RUN mkdir -p ${USER_HOME}/.config
 RUN chown -R ${USER}:${USER} ${USER_HOME}
 
+
 ### PYTHON STAGE ###
 FROM devcontainer_base AS devcontainer_python
 ARG CUSTOM_PYTHON_VERSION
@@ -126,6 +127,7 @@ RUN if [ ${DOCKER} == true ]; then \
     && rm -rf /var/lib/apt/lists/* \
     ;fi
 
+
 ### CPP STAGE ###
 FROM devcontainer_docker AS devcontainer_cpp
 ARG GPP_VERSION
@@ -143,6 +145,7 @@ RUN if [ ${GPP_VERSION} != false ]; then \
     && update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-${GPP_VERSION} 100 \
     ;fi
 
+
 ### FLUTTER STAGE ###
 FROM devcontainer_cpp as devcontainer_flutter
 ARG USER
@@ -155,13 +158,10 @@ ENV DEBIAN_FRONTEND noninteractive
 USER root
 SHELL ["/bin/bash", "-euco", "pipefail"]
 
-
-
 # COPY provisioning/docker_entrypoint.sh /usr/local/bin/docker_entrypoint.sh
 # COPY provisioning/ndkTests.sh /usr/local/bin/ndkTests.sh
 # RUN chmod +x /usr/local/bin/*
 # COPY provisioning/51-android.rules /etc/udev/rules.d/51-android.rules
-
 
 #ENV JAVA_VERSION="8"
 ENV ANDROID_TOOLS_URL="https://dl.google.com/android/repository/commandlinetools-linux-6858069_latest.zip"
@@ -263,6 +263,7 @@ ARG ANDROID_STUDIO_URL=https://r1---sn-h0jeenld.gvt1.com/edgedl/android/studio/i
 RUN wget "$ANDROID_STUDIO_URL" -O android-studio.tar.gz && tar xzvf android-studio.tar.gz -C $ANDROID_STUDIO_ROOT && rm android-studio.tar.gz
 RUN chown ${USER}:${USER} $ANDROID_STUDIO_ROOT
 ENV ANDROID_EMULATOR_USE_SYSTEM_LIBS=1
+
 
 ### COMMON DEVELOPMENT TOOLS ###
 FROM devcontainer_flutter AS devcontainer
