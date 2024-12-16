@@ -176,7 +176,7 @@ ENV PATH="$ANDROID_SDK_ROOT/cmdline-tools/tools/bin:$ANDROID_SDK_ROOT/emulator:$
 # install all dependencies
 ENV DEBIAN_FRONTEND="noninteractive"
 RUN apt-get update \
-  && apt-get install --yes --no-install-recommends openjdk-17-jdk curl unzip sed git bash xz-utils libglvnd0 ssh xauth x11-xserver-utils libpulse0 libxcomposite1 libgl1-mesa-glx sudo \
+  && apt-get install --yes --no-install-recommends openjdk-17-jdk curl unzip sed git bash xz-utils libglvnd0 ssh xauth x11-xserver-utils libpulse0 libxcomposite1 libgl1-mesa-glx sudo libgtk-3-dev pkg-config \
   && rm -rf /var/lib/apt/lists/*
 
 USER $USER
