@@ -43,7 +43,7 @@
         "editor.codeActionsOnSave": {
             "source.fixAll": "explicit",
             "source.organizeImports": "explicit"
-        },
+        }
     },
     "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
     "python.terminal.activateEnvironment": true,
@@ -55,14 +55,15 @@
     "[restructuredtext]": {
         "editor.tabSize": 4
     },
-    "pylint.interpreter": [
-        "${workspaceFolder}/.venv/bin/python"
-    ],
+    "pylint.interpreter": ["${workspaceFolder}/.venv/bin/python"],
     "python.analysis.autoImportCompletions": true,
     "python.analysis.autoFormatStrings": true,
     "pylint.importStrategy": "fromEnvironment",
     "python.terminal.activateEnvInCurrentTerminal": true,
-    "python.analysis.extraPaths": [
-        "${workspaceFolder}/.venv/lib/python3.10/site-packages"
-    ],
+    "python.analysis.extraPaths": ["${workspaceFolder}/.venv/lib/python3.10/site-packages"],
+    "python.analysis.diagnosticSeverityOverrides": {
+        "reportUnknownArgumentType": "none",
+        "reportUnknownParameterType": "none",
+        "reportMissingTypeArgument": "none"
+    }
 }
