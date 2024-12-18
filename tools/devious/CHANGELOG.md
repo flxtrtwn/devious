@@ -1,3 +1,9 @@
+# 0.9.0 (2024-11-9)
+
+## Feat
+
+-   Always pull latest dependencies
+
 # 0.8.1 (2024-11-9)
 
 ## Bugfix
