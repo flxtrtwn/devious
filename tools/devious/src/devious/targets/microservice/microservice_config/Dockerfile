@@ -17,4 +17,4 @@ CMD ["./start-server.sh"]
 
 # Mount secrets
 # RUN --mount=type=secret,id=some_secret \
-#     some_command --secret "$(cat /run/secrets/some_secret)"
+#     some_command --secret "$$(cat /run/secrets/some_secret)"

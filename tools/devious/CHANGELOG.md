@@ -1,3 +1,9 @@
+# 0.9.1 (2024-12-20)
+
+## Fix
+
+-   Dockerfile template for Microservice contained unescaped "$"
+
 # 0.9.0 (2024-11-9)
 
 ## Feat
