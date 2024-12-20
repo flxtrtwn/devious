@@ -8,7 +8,7 @@ WORKDIR ${DEPLOYMENT_DIR}
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 RUN pip install fastapi uvicorn gunicorn --cache-dir pip_cache
-RUN pip install -r requirements.txt --cache-dir pip_cache
+RUN pip install -e ${DEPLOYMENT_DIR}/app
 RUN chown -R www-data:www-data ${DEPLOYMENT_DIR}
 STOPSIGNAL SIGTERM
 RUN chmod +x start-server.sh

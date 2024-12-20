@@ -47,10 +47,10 @@ class Microservice(Target):
     def create(cls, target_name: str) -> None:
         target_dir = REPO_CONFIG.app_dir / target_name
         target_dir.mkdir(parents=True)
-        (target_dir / "requirements.txt").touch()
         target_src_dir = target_dir / "src" / target_name
         target_src_dir.mkdir(parents=True)
         entrypoint = target_src_dir / "main.py"
+        (target_src_dir.parent / "pyproject.toml").touch()
         entrypoint.write_text(example_main_py())
         (target_src_dir / "__init__.py").touch()
         target_tests_dir = target_dir / "tests"
@@ -83,8 +83,7 @@ class Microservice(Target):
         if clean:
             shutil.rmtree(self.target_build_dir, ignore_errors=True)
         try:
-            shutil.copytree(self.target_src_dir, self.app_build_dir)
-            shutil.copy(self.target_dir / "requirements.txt", self.target_build_dir)
+            shutil.copytree(self.target_src_dir.parent, self.app_build_dir)
         except FileExistsError:
             logger.error("%s exists already. To overwrite, build --clean.", self.target_build_dir)
             sys.exit(1)
@@ -116,9 +115,9 @@ class Microservice(Target):
                 session.run(linux.apt_get_install(["nginx"]))
                 session.run(["rm", "/etc/nginx/sites-available/default"])
                 session.run(["rm", "/etc/nginx/sites-enabled/default"])
+            session.upload(self.target_build_dir, self.deployment_dir)
             if session.run(["[ -e /etc/nginx/api_backends.conf ]"]):
                 session.run(["cp", "-r", (self.deployment_dir / "nginx_config").as_posix() + "/.", "/etc/nginx/"])
-            session.upload(self.target_build_dir, self.deployment_dir)
             session.run(
                 [
                     "cp",

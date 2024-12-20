@@ -1,3 +1,13 @@
+# 0.10.0 (2024-12-20)
+
+# Feat
+
+-   Install apps in microservices
+
+## Fix
+
+-   Copy over app dir before trying to modify nginxconfig in microservices
+
 # 0.9.1 (2024-12-20)
 
 ## Fix
