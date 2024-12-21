@@ -1,3 +1,10 @@
+# 0.10.1 (2024-12-21)
+
+
+## Fix
+
+-   Not copy over not existing requirements.txt in microservices
+
 # 0.10.0 (2024-12-20)
 
 # Feat

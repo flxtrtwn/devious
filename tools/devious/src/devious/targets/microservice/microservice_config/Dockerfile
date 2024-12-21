@@ -1,7 +1,7 @@
 FROM python:latest
 RUN mkdir -p ${DEPLOYMENT_DIR}
 RUN mkdir -p ${DEPLOYMENT_DIR}/pip_cache
-COPY requirements.txt start-server.sh ${DEPLOYMENT_DIR}
+COPY start-server.sh ${DEPLOYMENT_DIR}
 #TODO: COPY .pip_cache /opt/app/pip_cache/
 COPY app ${DEPLOYMENT_DIR}/app
 WORKDIR ${DEPLOYMENT_DIR}
