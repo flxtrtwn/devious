@@ -1,5 +1,10 @@
-# 0.10.1 (2024-12-21)
+# 0.10.2 (2024-12-27)
 
+## Fix
+
+-   Allow SSH agent; avoid unusability for more than one key present
+
+# 0.10.1 (2024-12-21)
 
 ## Fix
 

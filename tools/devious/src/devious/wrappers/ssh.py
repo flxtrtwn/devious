@@ -1,8 +1,8 @@
 """Wraps ssh calls."""
+
 import logging
 import os
 import subprocess
-from getpass import getpass
 from pathlib import Path, PurePath
 
 from paramiko import SSHClient, WarningPolicy
@@ -26,13 +26,7 @@ class SSHSession:
         self.client.set_missing_host_key_policy(WarningPolicy())  # TODO: Is this safe?
         self.client.load_system_host_keys()
         private_key_files = list((Path.home() / ".ssh").glob("id_*"))
-        self.client.connect(
-            hostname=ip_address,
-            username=user,
-            passphrase=getpass("Enter SSH private cert key: "),
-            allow_agent=False,
-            key_filename=[str(file) for file in private_key_files],
-        )
+        self.client.connect(hostname=ip_address, username=user, key_filename=[str(file) for file in private_key_files])
 
     def __enter__(self):
         return self
