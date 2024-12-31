@@ -4,7 +4,6 @@ import shutil
 import string
 import subprocess
 import sys
-from getpass import getpass
 from pathlib import Path, PurePath
 
 from devious import utils
@@ -13,14 +12,14 @@ from devious.targets import target
 from devious.targets.target import Target
 from devious.wrappers import docker, linux, pytest, ssh
 
-MICROSERVICE_CONFIG_DIR = Path(__file__).parent / "microservice_config/"
+WEBAPP_CONFIG_DIR = Path(__file__).parent / "webapp_config/"
 NGINX_CONFIG_DIR = Path(__file__).parent / "nginx_config/"
 
 logger = logging.getLogger()
 
 
-class Microservice(Target):
-    """A microservice is a single docker container that can be deployed to a VM.
+class Webapp(Target):
+    """A webapp is a single docker container that can be deployed to a VM.
     It is expected that the VM runs an NGINX instance.
     Reverse-proxying requests to the service is configured on deploy.
     If no NGINX is installed on the deployment VM, it is installed."""
@@ -79,7 +78,7 @@ class Microservice(Target):
         return False
 
     def build(self, clean: bool) -> None:
-        """Build microservice as Docker container."""
+        """Build webapp as Docker container."""
         if clean:
             shutil.rmtree(self.target_build_dir, ignore_errors=True)
         try:
@@ -87,19 +86,15 @@ class Microservice(Target):
         except FileExistsError:
             logger.error("%s exists already. To overwrite, build --clean.", self.target_build_dir)
             sys.exit(1)
-        api_key = getpass("Enter default API Key or leave empty to leave as is: ")
         with utils.temp_env(
             target_name=self.target_name,
             application_port=str(self.application_port),
             deployment_dir=self.deployment_dir.as_posix(),
             domain_name=self.domain_name,
-            api_key=api_key,
             all_caps=True,
         ):
-            copy_files_with_substitution(MICROSERVICE_CONFIG_DIR, self.target_build_dir)
+            copy_files_with_substitution(WEBAPP_CONFIG_DIR, self.target_build_dir)
             copy_files_with_substitution(NGINX_CONFIG_DIR, self.target_build_dir / "nginx_config")
-        if not api_key:
-            (self.target_build_dir / "nginx_config" / "api_keys.conf").unlink()
 
     def test(self, coverage: bool) -> bool:
         coverage_dir = REPO_CONFIG.metrics_dir / "pytest-coverage" / self.target_name
@@ -116,26 +111,10 @@ class Microservice(Target):
                 session.run(["rm", "/etc/nginx/sites-available/default"])
                 session.run(["rm", "/etc/nginx/sites-enabled/default"])
             session.upload(self.target_build_dir, self.deployment_dir)
-            if session.run(["[ -e /etc/nginx/api_backends.conf ]"]):
-                session.run(["cp", "-r", (self.deployment_dir / "nginx_config").as_posix() + "/.", "/etc/nginx/"])
-            session.run(
-                [
-                    "cp",
-                    (self.deployment_dir / "api.conf").as_posix(),
-                    f"/etc/nginx/api_conf.d/api_{self.target_name}.conf",
-                ]
-            )
-            api_backend_append_string = (self.target_build_dir / "api_backend.conf").read_text()
-            api_backend_append_string_first_line = (
-                (self.target_build_dir / "api_backend.conf").read_text().split("\n")[0]
-            )
-            session.run(
-                linux.append_to_file_not_contains(
-                    not_contains=api_backend_append_string_first_line, to_append=api_backend_append_string
-                )
-            )
+            session.run(["cp", "-r", (self.deployment_dir / "nginx_config").as_posix() + "/.", "/etc/nginx/"])
             session.run(docker.docker_build(self.deployment_dir, self.target_name))
             session.run(set_up_ssl_cert(domain_name=self.domain_name, email=self.email))
+            session.run(["service", "nginx", "reload"])
 
     def run(self) -> None:
         with ssh.SSHSession(self.domain_name) as session:
@@ -144,6 +123,8 @@ class Microservice(Target):
 
     def debug(self) -> None:
         subprocess.run(["pip", "install", "-r", (self.target_dir / "requirements.txt").as_posix()])
+        # TODO: Ask which debug mode
+        subprocess.run(["fastapi", "dev", self.target_src_dir / "main.py"])
         subprocess.run(
             [
                 "uvicorn",

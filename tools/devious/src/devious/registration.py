@@ -1,13 +1,14 @@
 import importlib
-from typing import Type
+from typing import Dict, List, Type
 
 from devious.config import REPO_CONFIG
 from devious.targets.django_app.django_app import DjangoApp
 from devious.targets.microservice.microservice import Microservice
 from devious.targets.target import Target
+from devious.targets.webapp.webapp import Webapp
 
 registered_targets = importlib.import_module("registered_targets", package=str(REPO_CONFIG.registered_targets_path))
-REGISTERED_TARGETS = registered_targets.REGISTERED_TARGETS
+REGISTERED_TARGETS: List[Target] = registered_targets.REGISTERED_TARGETS
 
 
 def find_target(target_name: str) -> Target:
@@ -30,4 +31,4 @@ def verify_registration() -> bool:
     return len(target_names) != len(set(target_names))
 
 
-KNOWN_TARGETS = {"django-app": DjangoApp, "microservice": Microservice}
+KNOWN_TARGETS: Dict[str, Type[Target]] = {"django-app": DjangoApp, "microservice": Microservice, "webapp": Webapp}
