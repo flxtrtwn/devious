@@ -1,3 +1,9 @@
+# 0.12.0 (2025-01-03)
+
+## Feat
+
+-   Docker compose build in webapp target
+
 # 0.11.0 (2024-12-31)
 
 ## Feat

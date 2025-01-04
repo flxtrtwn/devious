@@ -6,6 +6,8 @@ import subprocess
 import sys
 from pathlib import Path, PurePath
 
+import ruamel.yaml
+
 from devious import utils
 from devious.config import REPO_CONFIG
 from devious.targets import target
@@ -41,6 +43,7 @@ class Webapp(Target):
         self.deployment_dir = deployment_dir
         self.application_port = application_port
         self.entrypoint = self.target_src_dir / "main.py"
+        self.deployed_docker_compose_yaml = self.deployment_dir / "docker-compose.yaml"
 
     @classmethod
     def create(cls, target_name: str) -> None:
@@ -55,6 +58,19 @@ class Webapp(Target):
         target_tests_dir = target_dir / "tests"
         target_tests_dir.mkdir(parents=True)
         target.extend_pythonpath(target_src_dir.parent)
+        docker_compose_file = target_dir / "docker-compose.yaml"
+        ruamel.yaml.YAML().dump(
+            {
+                "services": {
+                    target_name: {
+                        "build": {"context": ".", "network": "host"},
+                        "ports": None,
+                        "network_mode": "host",  # TODO: Apply proper networking
+                    }
+                }
+            },
+            docker_compose_file,
+        )
         logger.info("Your target %s was set up, please register it in registered_targets.py.", target_name)
 
     def verify(self) -> bool:
@@ -112,13 +128,13 @@ class Webapp(Target):
                 session.run(["rm", "/etc/nginx/sites-enabled/default"])
             session.upload(self.target_build_dir, self.deployment_dir)
             session.run(["cp", "-r", (self.deployment_dir / "nginx_config").as_posix() + "/.", "/etc/nginx/"])
-            session.run(docker.docker_build(self.deployment_dir, self.target_name))
+            session.run(docker.docker_compose_build(self.deployed_docker_compose_yaml))
             session.run(set_up_ssl_cert(domain_name=self.domain_name, email=self.email))
             session.run(["service", "nginx", "reload"])
 
     def run(self) -> None:
         with ssh.SSHSession(self.domain_name) as session:
-            session.run(docker.docker_run({self.application_port: self.application_port}, self.target_name))
+            session.run(docker.docker_compose_up(docker_compose_yaml=self.deployed_docker_compose_yaml))
             session.run(["service", "nginx", "start"])
 
     def debug(self) -> None:
@@ -140,8 +156,7 @@ class Webapp(Target):
 
     def stop(self) -> None:
         with ssh.SSHSession(self.domain_name) as session:
-            session.run(docker.docker_stop(self.target_name))
-            session.run(docker.docker_stop_dangling())
+            session.run(docker.docker_compose_stop(docker_compose_yaml=self.deployed_docker_compose_yaml))
 
 
 def copy_files_with_substitution(template_dir: Path, target_dir: Path) -> None:

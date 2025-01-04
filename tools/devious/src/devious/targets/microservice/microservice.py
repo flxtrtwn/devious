@@ -144,6 +144,8 @@ class Microservice(Target):
 
     def debug(self) -> None:
         subprocess.run(["pip", "install", "-r", (self.target_dir / "requirements.txt").as_posix()])
+        # TODO: Ask which debug mode
+        subprocess.run(["fastapi", "dev", self.target_src_dir / "main.py"])
         subprocess.run(
             [
                 "uvicorn",

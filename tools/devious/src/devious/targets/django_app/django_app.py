@@ -40,7 +40,6 @@ class DjangoApp(Target):
         self.deployment_dir = deployment_dir
         self.dev_django_manager = self.target_src_dir / "manage.py"
         self.build_django_manager = self.app_build_dir / "manage.py"
-        self.build_docker_compose_yaml = self.target_build_dir / "docker-compose.yaml"
         self.deployed_django_manager = self.deployment_dir / "app" / "manage.py"
         self.deployed_docker_compose_yaml = self.deployment_dir / "docker-compose.yaml"
 
