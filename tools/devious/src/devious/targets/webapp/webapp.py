@@ -34,12 +34,14 @@ class Webapp(Target):
         domain_name: str,
         application_port: int,
         email: str,
+        bind_ports: dict[int, int],
         deployment_dir: PurePath,
     ) -> None:
         Target.__init__(self, target_name, base_target_dir, base_build_dir)
         self.app_build_dir = self.target_build_dir / "app"
         self.domain_name = domain_name
         self.email = email
+        self.bind_ports = bind_ports
         self.deployment_dir = deployment_dir
         self.application_port = application_port
         self.entrypoint = self.target_src_dir / "main.py"
@@ -102,8 +104,10 @@ class Webapp(Target):
         except FileExistsError:
             logger.error("%s exists already. To overwrite, build --clean.", self.target_build_dir)
             sys.exit(1)
+
         with utils.temp_env(
             target_name=self.target_name,
+            exposed_ports=" ".join(str(docker_port) for _, docker_port in self.bind_ports.items()),
             application_port=str(self.application_port),
             deployment_dir=self.deployment_dir.as_posix(),
             domain_name=self.domain_name,
@@ -111,6 +115,7 @@ class Webapp(Target):
         ):
             copy_files_with_substitution(WEBAPP_CONFIG_DIR, self.target_build_dir)
             copy_files_with_substitution(NGINX_CONFIG_DIR, self.target_build_dir / "nginx_config")
+            configure_compose(self.target_build_dir, self.target_name, self.bind_ports)
 
     def test(self, coverage: bool) -> bool:
         coverage_dir = REPO_CONFIG.metrics_dir / "pytest-coverage" / self.target_name
@@ -169,6 +174,16 @@ def copy_files_with_substitution(template_dir: Path, target_dir: Path) -> None:
         (target_dir / template.relative_to(template_dir)).write_text(
             string.Template(template.read_text()).substitute(os.environ)
         )
+
+
+def configure_compose(dir: Path, app_name: str, app_docker_ports: dict[int, int]) -> None:
+    docker_compose_file = dir / "docker-compose.yaml"
+    yaml = ruamel.yaml.YAML()
+    data = yaml.load(docker_compose_file)
+    data["services"][app_name].update(
+        {"ports": [f"{str(host_port)}:{str(docker_port)}" for host_port, docker_port in app_docker_ports.items()]}
+    )
+    yaml.dump(data, docker_compose_file)
 
 
 def set_up_ssl_cert(domain_name: str, email: str) -> list[str]:
