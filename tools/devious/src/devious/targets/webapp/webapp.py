@@ -34,14 +34,12 @@ class Webapp(Target):
         domain_name: str,
         application_port: int,
         email: str,
-        bind_ports: dict[int, int],
         deployment_dir: PurePath,
     ) -> None:
         Target.__init__(self, target_name, base_target_dir, base_build_dir)
         self.app_build_dir = self.target_build_dir / "app"
         self.domain_name = domain_name
         self.email = email
-        self.bind_ports = bind_ports
         self.deployment_dir = deployment_dir
         self.application_port = application_port
         self.entrypoint = self.target_src_dir / "main.py"
@@ -101,13 +99,13 @@ class Webapp(Target):
             shutil.rmtree(self.target_build_dir, ignore_errors=True)
         try:
             shutil.copytree(self.target_src_dir.parent, self.app_build_dir)
+            shutil.copy(self.target_dir / "docker-compose.yaml", self.target_build_dir)
         except FileExistsError:
             logger.error("%s exists already. To overwrite, build --clean.", self.target_build_dir)
             sys.exit(1)
 
         with utils.temp_env(
             target_name=self.target_name,
-            exposed_ports=" ".join(str(docker_port) for _, docker_port in self.bind_ports.items()),
             application_port=str(self.application_port),
             deployment_dir=self.deployment_dir.as_posix(),
             domain_name=self.domain_name,
@@ -115,7 +113,7 @@ class Webapp(Target):
         ):
             copy_files_with_substitution(WEBAPP_CONFIG_DIR, self.target_build_dir)
             copy_files_with_substitution(NGINX_CONFIG_DIR, self.target_build_dir / "nginx_config")
-            configure_compose(self.target_build_dir, self.target_name, self.bind_ports)
+            configure_compose(self.target_build_dir, self.target_name, {self.application_port: self.application_port})
 
     def test(self, coverage: bool) -> bool:
         coverage_dir = REPO_CONFIG.metrics_dir / "pytest-coverage" / self.target_name
