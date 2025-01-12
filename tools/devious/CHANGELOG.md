@@ -1,4 +1,10 @@
-# 0.12.1 (2025-01-11)
+# 0.12.3 (2025-01-12)
+
+## Fix
+
+-   (webapp, django-app) Let gunicorn listen to locations outside of the container
+
+# 0.12.2 (2025-01-12)
 
 ## Fix
 

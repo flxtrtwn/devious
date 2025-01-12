@@ -60,15 +60,7 @@ class Webapp(Target):
         target.extend_pythonpath(target_src_dir.parent)
         docker_compose_file = target_dir / "docker-compose.yaml"
         ruamel.yaml.YAML().dump(
-            {
-                "services": {
-                    target_name: {
-                        "build": {"context": ".", "network": "host"},
-                        "ports": None,
-                        "network_mode": "host",  # TODO: Apply proper networking
-                    }
-                }
-            },
+            {"services": {target_name: {"build": {"context": ".", "network": "host"}, "ports": None}}},
             docker_compose_file,
         )
         logger.info("Your target %s was set up, please register it in registered_targets.py.", target_name)

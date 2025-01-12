@@ -71,15 +71,7 @@ class DjangoApp(Target):
             [str(dev_django_manager), "runserver", "--settings", f"{target_name}.debug_settings"], check=True
         )
         ruamel.yaml.YAML().dump(
-            {
-                "services": {
-                    target_name: {
-                        "build": {"context": ".", "network": "host"},
-                        "ports": None,
-                        "network_mode": "host",  # TODO: Apply proper networking
-                    }
-                }
-            },
+            {"services": {target_name: {"build": {"context": ".", "network": "host"}, "ports": None}}},
             docker_compose_file,
         )
         logger.info("Your target %s was set up, please register it in registered_targets.py.", target_name)
