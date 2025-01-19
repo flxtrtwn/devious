@@ -1,3 +1,9 @@
+# 0.13.0 (2025-01-19)
+
+## Feat
+
+-   (webapp) Full debug mode with docker compose
+
 # 0.12.3 (2025-01-12)
 
 ## Fix

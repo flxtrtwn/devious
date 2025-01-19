@@ -11,5 +11,7 @@ logger = logging.getLogger()
 
 @click.command()
 @click.option("--target", type=str, required=True)
-def debug(target: str) -> None:
-    registration.find_target(target).debug()
+@click.option("--full", type=bool)
+def debug(target: str, full: bool) -> None:
+    """Debug target."""
+    registration.find_target(target).debug(full)

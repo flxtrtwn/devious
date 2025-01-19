@@ -85,10 +85,9 @@ class Webapp(Target):
             return True
         return False
 
-    def build(self, clean: bool) -> None:
+    def build(self, clean: bool = True) -> None:
         """Build webapp as Docker container."""
-        if clean:
-            shutil.rmtree(self.target_build_dir, ignore_errors=True)
+        shutil.rmtree(self.target_build_dir, ignore_errors=True)
         try:
             shutil.copytree(self.target_src_dir.parent, self.app_build_dir)
             shutil.copy(self.target_dir / "docker-compose.yaml", self.target_build_dir)
@@ -132,22 +131,27 @@ class Webapp(Target):
             session.run(docker.docker_compose_up(docker_compose_yaml=self.deployed_docker_compose_yaml))
             session.run(["service", "nginx", "start"])
 
-    def debug(self) -> None:
-        subprocess.run(["pip", "install", "-r", (self.target_dir / "requirements.txt").as_posix()])
+    def debug(self, full: bool = False) -> None:
         # TODO: Ask which debug mode
-        subprocess.run(["fastapi", "dev", self.target_src_dir / "main.py"])
-        subprocess.run(
-            [
-                "uvicorn",
-                self.entrypoint.relative_to(self.target_src_dir.parent).with_suffix("").as_posix().replace("/", ".")
-                + ":app",
-                "--reload",
-                "--reload-dir",
-                self.target_src_dir,
-                "--port",
-                str(self.application_port),
-            ]
-        )
+        if full:
+            self.build()
+            docker.docker_compose_down(self.target_build_dir / "docker-compose.yaml")
+            docker.docker_compose_build(self.target_build_dir / "docker-compose.yaml")
+            docker.docker_compose_up(self.target_build_dir / "docker-compose.yaml")
+        else:
+            subprocess.run(["fastapi", "dev", self.target_src_dir / "main.py"])
+            subprocess.run(
+                [
+                    "uvicorn",
+                    self.entrypoint.relative_to(self.target_src_dir.parent).with_suffix("").as_posix().replace("/", ".")
+                    + ":app",
+                    "--reload",
+                    "--reload-dir",
+                    self.target_src_dir,
+                    "--port",
+                    str(self.application_port),
+                ]
+            )
 
     def stop(self) -> None:
         with ssh.SSHSession(self.domain_name) as session:

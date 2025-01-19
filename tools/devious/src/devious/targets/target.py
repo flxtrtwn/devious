@@ -1,4 +1,5 @@
 """Application abstractions."""
+
 from abc import ABC, abstractmethod
 from pathlib import Path
 
@@ -8,6 +9,8 @@ from devious.config import REPO_CONFIG
 
 
 class Target(ABC):
+    """Generic software target."""
+
     @abstractmethod
     def __init__(self, target_name: str, base_target_dir: Path, base_build_dir: Path) -> None:
         self.target_name = target_name
@@ -27,7 +30,7 @@ class Target(ABC):
 
     @abstractmethod
     def build(self, clean: bool) -> None:
-        """Build target."""
+        """Build target, optionally clean."""
 
     @abstractmethod
     def deploy(self) -> None:
@@ -38,8 +41,8 @@ class Target(ABC):
         """Run (deployed) target."""
 
     @abstractmethod
-    def debug(self) -> None:
-        """Debug target."""
+    def debug(self, full: bool) -> None:
+        """Debug target, include the full system if needed."""
 
     @abstractmethod
     def stop(self) -> None:
