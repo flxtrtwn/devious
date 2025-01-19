@@ -1,3 +1,9 @@
+# 0.13.1 (2025-01-19)
+
+## Fix
+
+-   (webapp) Full debug mode as flag
+
 # 0.13.0 (2025-01-19)
 
 ## Feat
