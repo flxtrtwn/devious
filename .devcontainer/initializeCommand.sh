@@ -58,17 +58,17 @@ if [ ! "$(tail -n 1 $USER_ENV_FILE)" = "USER=$USER" ]; then
 	echo "USER=$USER" >>$USER_ENV_FILE
 fi
 
-HOST_DISPLAY=10
-DOCKER_DISPLAY=99
-AUTH_COOKIE=$(xauth list | grep "^$(hostname)/unix:$HOST_DISPLAY " | awk '{print $3}')
-CONTAINER_HOSTNAME=devious
-DOCKER_XAUTHORITY=${HOME}/.Xauthority.docker
-rm $DOCKER_XAUTHORITY || echo "Adding $DOCKER_XAUTHORITY"
-touch "$DOCKER_XAUTHORITY"
-xauth -f ${DOCKER_XAUTHORITY} add ${CONTAINER_HOSTNAME}/unix:${DOCKER_DISPLAY} MIT-MAGIC-COOKIE-1 ${AUTH_COOKIE}
-CONTAINER_SOCKET=/tmp/.X11-unix/X${DOCKER_DISPLAY}
-sudo apt update && sudo apt install daemonize
-DAEMON_LOCKFILE=${HOME}/.socat-x11-bridge.lock
-sudo kill "$(cat "$DAEMON_LOCKFILE")" || echo "Process with PID in $DAEMON_LOCKFILE not running"
-rm "$DAEMON_LOCKFILE" || echo "No lockfile existing at $DAEMON_LOCKFILE"
-daemonize -l "$DAEMON_LOCKFILE" -p "$DAEMON_LOCKFILE" /usr/bin/socat TCP:localhost:60${HOST_DISPLAY},fork,reuseaddr UNIX-LISTEN:${CONTAINER_SOCKET}
+# HOST_DISPLAY=10
+# DOCKER_DISPLAY=99
+# AUTH_COOKIE=$(xauth list | grep "^$(hostname)/unix:$HOST_DISPLAY " | awk '{print $3}')
+# CONTAINER_HOSTNAME=devious
+# DOCKER_XAUTHORITY=${HOME}/.Xauthority.docker
+# rm $DOCKER_XAUTHORITY || echo "Adding $DOCKER_XAUTHORITY"
+# touch "$DOCKER_XAUTHORITY"
+# xauth -f ${DOCKER_XAUTHORITY} add ${CONTAINER_HOSTNAME}/unix:${DOCKER_DISPLAY} MIT-MAGIC-COOKIE-1 ${AUTH_COOKIE}
+# CONTAINER_SOCKET=/tmp/.X11-unix/X${DOCKER_DISPLAY}
+# sudo apt update && sudo apt install daemonize
+# DAEMON_LOCKFILE=${HOME}/.socat-x11-bridge.lock
+# sudo kill "$(cat "$DAEMON_LOCKFILE")" || echo "Process with PID in $DAEMON_LOCKFILE not running"
+# rm "$DAEMON_LOCKFILE" || echo "No lockfile existing at $DAEMON_LOCKFILE"
+# daemonize -l "$DAEMON_LOCKFILE" -p "$DAEMON_LOCKFILE" /usr/bin/socat TCP:localhost:60${HOST_DISPLAY},fork,reuseaddr UNIX-LISTEN:${CONTAINER_SOCKET}
