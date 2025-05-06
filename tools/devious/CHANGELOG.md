@@ -1,3 +1,9 @@
+# 0.15.0 (2025-01-19)
+
+## Feat
+
+-   (webapp) Generic deployment
+
 # 0.13.1 (2025-01-19)
 
 ## Fix
