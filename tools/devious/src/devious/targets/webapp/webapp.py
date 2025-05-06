@@ -39,7 +39,7 @@ class Webapp(Target):
         self.deployment_dir = deployment_dir
         self.application_port = application_port
         self.entrypoint = self.target_src_dir / "main.py"
-        self.deployed_docker_compose_yaml = self.deployment_dir / "docker-compose.yaml"
+        self.deployed_docker_compose_yaml = self.deployment_dir / "src" / "docker-compose.yaml"
 
     @classmethod
     def create(cls, target_name: str) -> None:
@@ -99,7 +99,7 @@ class Webapp(Target):
                 session.run(linux.apt_get_install(["nginx"]))
                 session.run(["rm", "/etc/nginx/sites-available/default"])
                 session.run(["rm", "/etc/nginx/sites-enabled/default"])
-            session.upload(self.target_build_dir, self.deployment_dir)
+            session.upload(self.target_dir, self.deployment_dir)
             session.run(["cp", "-r", (self.deployment_dir / "nginx_config").as_posix() + "/.", "/etc/nginx/"])
             session.run(docker.docker_compose_build(self.deployed_docker_compose_yaml))
             session.run(set_up_ssl_cert(domain_name=self.domain_name, email=self.email))
