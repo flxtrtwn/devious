@@ -1,14 +1,10 @@
 import logging
 import os
-import shutil
 import string
-import subprocess
-import sys
 from pathlib import Path, PurePath
 
 import ruamel.yaml
 
-from devious import utils
 from devious.config import REPO_CONFIG
 from devious.targets import target
 from devious.targets.target import Target
@@ -21,7 +17,7 @@ logger = logging.getLogger()
 
 
 class Webapp(Target):
-    """A webapp is a single docker container that can be deployed to a VM.
+    """A webapp is a docker compose unit that can be deployed to a VM.
     It is expected that the VM runs an NGINX instance.
     Reverse-proxying requests to the service is configured on deploy.
     If no NGINX is installed on the deployment VM, it is installed."""
@@ -69,16 +65,16 @@ class Webapp(Target):
         if super().verify():
             return True
         if not next(
-            self.target_dir.glob("requirements.txt"),
+            self.target_dir.glob("pyproject.toml"),
             None,  # pyright: ignore [reportGeneralTypeIssues]
         ):
             logger.error("No Python requirements specified.")
             return True
         if not next(
-            self.target_dir.glob("Dockerfile"),
+            self.target_dir.glob("docker-compose.yaml"),
             None,  # pyright: ignore [reportGeneralTypeIssues]
         ):
-            logger.error("No Dockerfile.")
+            logger.error("No Docker compose file.")
             return True
         if not self.target_src_dir.is_dir():
             logger.error("Missing a valid 'src' dir in %s.", self.target_dir)
@@ -86,25 +82,8 @@ class Webapp(Target):
         return False
 
     def build(self, clean: bool = True) -> None:
-        """Build webapp as Docker container."""
-        shutil.rmtree(self.target_build_dir, ignore_errors=True)
-        try:
-            shutil.copytree(self.target_src_dir.parent, self.app_build_dir)
-            shutil.copy(self.target_dir / "docker-compose.yaml", self.target_build_dir)
-        except FileExistsError:
-            logger.error("%s exists already. To overwrite, build --clean.", self.target_build_dir)
-            sys.exit(1)
-
-        with utils.temp_env(
-            target_name=self.target_name,
-            application_port=str(self.application_port),
-            deployment_dir=self.deployment_dir.as_posix(),
-            domain_name=self.domain_name,
-            all_caps=True,
-        ):
-            copy_files_with_substitution(WEBAPP_CONFIG_DIR, self.target_build_dir)
-            copy_files_with_substitution(NGINX_CONFIG_DIR, self.target_build_dir / "nginx_config")
-            configure_compose(self.target_build_dir, self.target_name, {self.application_port: self.application_port})
+        """Build webapp as Docker compose unit."""
+        docker.docker_compose_build(self.target_src_dir / "docker-compose.yaml")
 
     def test(self, coverage: bool) -> bool:
         coverage_dir = REPO_CONFIG.metrics_dir / "pytest-coverage" / self.target_name
@@ -135,23 +114,22 @@ class Webapp(Target):
         # TODO: Ask which debug mode
         if full:
             self.build()
-            docker.docker_compose_down(self.target_build_dir / "docker-compose.yaml")
-            docker.docker_compose_build(self.target_build_dir / "docker-compose.yaml")
-            docker.docker_compose_up(self.target_build_dir / "docker-compose.yaml")
+            docker.docker_compose_up(self.target_dir / "docker-compose.yaml")
         else:
-            subprocess.run(["fastapi", "dev", self.target_src_dir / "main.py"])
-            subprocess.run(
-                [
-                    "uvicorn",
-                    self.entrypoint.relative_to(self.target_src_dir.parent).with_suffix("").as_posix().replace("/", ".")
-                    + ":app",
-                    "--reload",
-                    "--reload-dir",
-                    self.target_src_dir,
-                    "--port",
-                    str(self.application_port),
-                ]
-            )
+            raise NotImplementedError
+            # subprocess.run(["fastapi", "dev", self.target_src_dir / "main.py"])
+            # subprocess.run(
+            #     [
+            #         "uvicorn",
+            #         self.entrypoint.relative_to(self.target_src_dir.parent).with_suffix("").as_posix().replace("/", ".")
+            #         + ":app",
+            #         "--reload",
+            #         "--reload-dir",
+            #         self.target_src_dir,
+            #         "--port",
+            #         str(self.application_port),
+            #     ]
+            # )
 
     def stop(self) -> None:
         with ssh.SSHSession(self.domain_name) as session:
