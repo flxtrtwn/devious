@@ -1,3 +1,9 @@
+# 0.16.1 (2025-05-07)
+
+## Fix
+
+-   No nginx start on deploy
+
 # 0.16.0 (2025-01-19)
 
 ## Feat

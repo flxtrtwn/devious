@@ -103,7 +103,6 @@ class Webapp(Target):
             session.run(["cp", "-r", (self.deployment_dir / "nginx_config").as_posix() + "/.", "/etc/nginx/"])
             session.run(docker.docker_compose_build(self.deployed_docker_compose_yaml))
             session.run(set_up_ssl_cert(domain_name=self.domain_name, email=self.email, test_cert=test))
-            session.run(["service", "nginx", "reload"])
 
     def run(self) -> None:
         with ssh.SSHSession(self.domain_name) as session:
