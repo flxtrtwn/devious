@@ -105,7 +105,7 @@ class Microservice(Target):
         coverage_dir = REPO_CONFIG.metrics_dir / "pytest-coverage" / self.target_name
         return pytest.test_directory(REPO_CONFIG.project_root, out_dir=coverage_dir, coverage=coverage, vis=False)
 
-    def deploy(self) -> None:
+    def deploy(self, test: bool) -> None:
         with ssh.SSHSession(self.domain_name) as session:
             if session.run(["command", "-v", "docker", ">/dev/null 2>&1"]):
                 session.run(docker.install_docker())
@@ -135,7 +135,7 @@ class Microservice(Target):
                 )
             )
             session.run(docker.docker_build(self.deployment_dir, self.target_name))
-            session.run(set_up_ssl_cert(domain_name=self.domain_name, email=self.email))
+            session.run(set_up_ssl_cert(domain_name=self.domain_name, email=self.email, test_cert=test))
 
     def run(self) -> None:
         with ssh.SSHSession(self.domain_name) as session:
@@ -177,18 +177,11 @@ def copy_files_with_substitution(template_dir: Path, target_dir: Path) -> None:
         )
 
 
-def set_up_ssl_cert(domain_name: str, email: str) -> list[str]:
-    certbot_cmd = [
-        "certbot",
-        "--nginx",
-        "--agree-tos",
-        "--test-cert",  # TODO: Get full cert
-        "--non-interactive",
-        "--email",
-        email,
-        "-d",
-        domain_name,
-    ]
+def set_up_ssl_cert(domain_name: str, email: str, test_cert: bool = False) -> list[str]:
+    """Set up SSL Cert for nginx."""
+    certbot_cmd = ["certbot", "--nginx", "--agree-tos", "--non-interactive", "--email", email, "-d", domain_name]
+    if test_cert:
+        certbot_cmd.append("--test-cert")
     return linux.chain_commands(
         [
             linux.apt_get_install(["python3", "python3-venv", "libaugeas0"]),

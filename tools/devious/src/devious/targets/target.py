@@ -33,8 +33,8 @@ class Target(ABC):
         """Build target, optionally clean."""
 
     @abstractmethod
-    def deploy(self) -> None:
-        """Deploy target in production."""
+    def deploy(self, test: bool) -> None:
+        """Deploy target in production or test environment."""
 
     @abstractmethod
     def run(self) -> None:

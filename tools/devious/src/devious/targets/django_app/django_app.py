@@ -119,7 +119,7 @@ class DjangoApp(Target):
         # TODO: Implement tests for DjangoApp targets
         return False
 
-    def deploy(self) -> None:
+    def deploy(self, test: bool) -> None:
         subprocess.run([str(self.build_django_manager), "check", "--deploy"], check=True)
         with ssh.SSHSession(self.domain_name) as session:
             if session.run(["command", "-v", "docker", ">/dev/null 2>&1"]):

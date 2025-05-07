@@ -1,3 +1,9 @@
+# 0.16.0 (2025-01-19)
+
+## Feat
+
+-   Test deployment (e.g., test cert)
+
 # 0.15.0 (2025-01-19)
 
 ## Feat
