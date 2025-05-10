@@ -39,7 +39,7 @@ class Webapp(Target):
         self.deployment_dir = deployment_dir
         self.application_port = application_port
         self.entrypoint = self.target_src_dir / "main.py"
-        self.deployed_docker_compose_yaml = self.deployment_dir / "src" / "docker-compose.yaml"
+        self.deployed_docker_compose_yaml = self.deployment_dir / "docker-compose.yaml"
 
     @classmethod
     def create(cls, target_name: str) -> None:
@@ -83,7 +83,7 @@ class Webapp(Target):
 
     def build(self, clean: bool = True) -> None:
         """Build webapp as Docker compose unit."""
-        docker.docker_compose_build(self.target_src_dir / "docker-compose.yaml")
+        docker.docker_compose_build(self.target_dir / "docker-compose.yaml")
 
     def test(self, coverage: bool) -> bool:
         coverage_dir = REPO_CONFIG.metrics_dir / "pytest-coverage" / self.target_name
