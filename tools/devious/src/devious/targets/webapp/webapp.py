@@ -65,6 +65,7 @@ class Webapp(Target):
             {"services": {target_name: {"build": {"context": ".", "network": "host"}, "ports": None}}},
             docker_compose_file,
         )
+        (target_dir / "secrets.yaml").write_text("path/to/file:\n  - SECRET_ID")
         logger.info("Your target %s was set up, please register it in registered_targets.py.", target_name)
 
     def verify(self) -> bool:
