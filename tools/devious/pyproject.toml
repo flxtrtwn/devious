@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "devious"
-version = "0.17.0"
+version = "0.18.0"
 description = "Generic development cli for various application types."
 authors = ["Felix Trautwein <mail@felixtrautwein.de>"]
 readme = "readme.md"
@@ -14,6 +14,7 @@ click=">=8.1.7"
 regex=">=2023.10.3"
 jstyleson=">=0.0.2"
 "ruamel.yaml"=">=0.18.5"
+python-dotenv=">=1.1.0"
 # Django Apps
 Django=">=4.2.7"
 django-bootstrap-v5=">=1.0.11"

@@ -1,8 +1,11 @@
 import logging
 import os
 import string
+from contextlib import contextmanager
 from pathlib import Path, PurePath
+from typing import Any, Dict, Generator, List
 
+import dotenv
 import ruamel.yaml
 
 from devious.config import REPO_CONFIG
@@ -12,6 +15,8 @@ from devious.wrappers import docker, linux, pytest, ssh
 
 WEBAPP_CONFIG_DIR = Path(__file__).parent / "webapp_config/"
 NGINX_CONFIG_DIR = Path(__file__).parent / "nginx_config/"
+
+YAML = ruamel.yaml.YAML()
 
 logger = logging.getLogger()
 
@@ -40,6 +45,7 @@ class Webapp(Target):
         self.application_port = application_port
         self.entrypoint = self.target_src_dir / "main.py"
         self.deployed_docker_compose_yaml = self.deployment_dir / "docker-compose.yaml"
+        self.secrets_yaml = self.target_dir / "secrets.yaml"
 
     @classmethod
     def create(cls, target_name: str) -> None:
@@ -99,7 +105,15 @@ class Webapp(Target):
                 session.run(linux.apt_get_install(["nginx"]))
                 session.run(["rm", "/etc/nginx/sites-available/default"])
                 session.run(["rm", "/etc/nginx/sites-enabled/default"])
-            session.upload(self.target_dir, self.deployment_dir)
+            try:
+                YAML.load(self.secrets_yaml.read_text(encoding="utf-8"))
+                dotenv.load_dotenv(dotenv_path=self.target_dir)
+            except FileNotFoundError:
+                pass
+            with substitute_placeholders(
+                YAML.load(self.secrets_yaml.read_text(encoding="utf-8")), environment=os.environ
+            ):
+                session.upload(self.target_dir, self.deployment_dir)
             session.run(["cp", "-r", (self.deployment_dir / "nginx_config").as_posix() + "/.", "/etc/nginx/"])
             session.run(docker.docker_compose_build(self.deployed_docker_compose_yaml))
             session.run(set_up_ssl_cert(domain_name=self.domain_name, email=self.email, test_cert=test))
@@ -135,26 +149,32 @@ class Webapp(Target):
             session.run(docker.docker_compose_stop(docker_compose_yaml=self.deployed_docker_compose_yaml))
 
 
-def copy_files_with_substitution(template_dir: Path, target_dir: Path) -> None:
+@contextmanager
+def substitute_placeholders(
+    placeholders: Dict[Path, List[str]], environment: Dict[str, str]
+) -> Generator[None, Any, None]:
     """Copy a file with string substitution."""
-    target_dir.mkdir(parents=True, exist_ok=True)
-    for template in template_dir.rglob("*"):
-        if template.is_dir():
-            (target_dir / template.relative_to(template_dir)).mkdir(parents=True, exist_ok=True)
-            continue
-        (target_dir / template.relative_to(template_dir)).write_text(
-            string.Template(template.read_text()).substitute(os.environ)
-        )
+    for path, strings_to_substitute in placeholders.items():
+        for string_to_substitute in strings_to_substitute:
+            if string_to_substitute not in environment:
+                raise ValueError(f"{string} not defined in environment.")
+    backed_up_files: Dict[Path, str] = {path: path.read_text(encoding="utf-8") for path in placeholders}
+    for path, content in backed_up_files.items():
+        path.write_text(string.Template(content).substitute(environment), encoding="utf-8")
+    try:
+        yield
+    finally:
+        for path, content in backed_up_files.items():
+            path.write_text(content, encoding="utf-8")
 
 
 def configure_compose(dir: Path, app_name: str, app_docker_ports: dict[int, int]) -> None:
     docker_compose_file = dir / "docker-compose.yaml"
-    yaml = ruamel.yaml.YAML()
-    data = yaml.load(docker_compose_file)
+    data = YAML.load(docker_compose_file)
     data["services"][app_name].update(
         {"ports": [f"{str(host_port)}:{str(docker_port)}" for host_port, docker_port in app_docker_ports.items()]}
     )
-    yaml.dump(data, docker_compose_file)
+    YAML.dump(data, docker_compose_file)
 
 
 def set_up_ssl_cert(domain_name: str, email: str, test_cert: bool = False) -> list[str]:
