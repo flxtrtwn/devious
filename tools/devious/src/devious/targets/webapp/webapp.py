@@ -107,7 +107,7 @@ class Webapp(Target):
                 session.run(["rm", "/etc/nginx/sites-enabled/default"])
             try:
                 YAML.load(self.secrets_yaml.read_text(encoding="utf-8"))
-                dotenv.load_dotenv(dotenv_path=self.target_dir)
+                dotenv.load_dotenv(dotenv_path=self.target_dir / ".env")
             except FileNotFoundError:
                 pass
             with substitute_placeholders(
