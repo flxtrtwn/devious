@@ -157,7 +157,7 @@ def substitute_placeholders(
     for path, strings_to_substitute in placeholders.items():
         for string_to_substitute in strings_to_substitute:
             if string_to_substitute not in environment:
-                raise ValueError(f"{string} not defined in environment.")
+                raise ValueError(f"{string_to_substitute} not defined in environment.")
     backed_up_files: Dict[Path, str] = {path: path.read_text(encoding="utf-8") for path in placeholders}
     for path, content in backed_up_files.items():
         path.write_text(string.Template(content).substitute(environment), encoding="utf-8")
