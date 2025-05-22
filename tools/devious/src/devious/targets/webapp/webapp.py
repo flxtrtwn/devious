@@ -106,14 +106,16 @@ class Webapp(Target):
                 session.run(linux.apt_get_install(["nginx"]))
                 session.run(["rm", "/etc/nginx/sites-available/default"])
                 session.run(["rm", "/etc/nginx/sites-enabled/default"])
+            secrets: Dict[Path, List[str]] = {}
             try:
-                YAML.load(self.secrets_yaml.read_text(encoding="utf-8"))
+                secrets = {
+                    Path(path): strings_to_substitute
+                    for path, strings_to_substitute in YAML.load(self.secrets_yaml.read_text(encoding="utf-8")).items()
+                }
                 dotenv.load_dotenv(dotenv_path=self.target_dir / ".env")
             except FileNotFoundError:
                 pass
-            with substitute_placeholders(
-                YAML.load(self.secrets_yaml.read_text(encoding="utf-8")), environment=os.environ
-            ):
+            with substitute_placeholders(secrets, environment=os.environ):
                 session.upload(self.target_dir, self.deployment_dir)
             session.run(["cp", "-r", (self.deployment_dir / "nginx_config").as_posix() + "/.", "/etc/nginx/"])
             session.run(docker.docker_compose_build(self.deployed_docker_compose_yaml))
