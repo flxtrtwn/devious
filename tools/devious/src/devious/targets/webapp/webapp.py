@@ -109,7 +109,7 @@ class Webapp(Target):
             secrets: Dict[Path, List[str]] = {}
             try:
                 secrets = {
-                    Path(path): strings_to_substitute
+                    self.target_dir / path: strings_to_substitute
                     for path, strings_to_substitute in YAML.load(self.secrets_yaml.read_text(encoding="utf-8")).items()
                 }
                 dotenv.load_dotenv(dotenv_path=self.target_dir / ".env")
