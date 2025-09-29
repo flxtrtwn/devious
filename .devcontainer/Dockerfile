@@ -175,7 +175,7 @@ RUN curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/in
 RUN mkdir -p ${USER_HOME}/.local/share/fonts && cd ${USER_HOME}/.local/share/fonts \
     && curl -fLO https://github.com/ryanoasis/nerd-fonts/raw/HEAD/patched-fonts/DroidSansMono/DroidSansMNerdFont-Regular.otf
 ENV PATH=$PATH:${USER_HOME}/.local/bin
-RUN curl -sSL https://install.python-poetry.org | python -
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 USER root
 RUN locale-gen en_US.UTF-8 && \

@@ -1,26 +1,36 @@
-[tool.poetry]
+[project]
 name = "devcontainer"
 version = "0.1.0"
 description = "Generic development cli for various application types."
-authors = ["Felix Trautwein <mail@felixtrautwein.de>"]
+authors = [{name="Felix Trautwein <mail@felixtrautwein.de>"}]
+requires-python = ">=3.10"
 
-[tool.poetry.dependencies]
-python="^3.10"
-devious = {path = "tools/devious", develop=true}
+dependencies = [
+    "ruff>=0.1.6",
+    "pre-commit>=3.5.0",
+    "pytest>=7.4.3",
+    "pytest-cases>=3.8.1",
+    "pytest-cov>=4.1.0",
+    "pylint>=3.0.2",
+    "pylint-django>=2.5.5",
+    "pylint-plugin-utils>=0.8.2",
+    "pip-licenses>=4.3.3",
+    "build>=1.0.3",
+    "twine>=4.0.2",
+    "toml>=0.10.2",
+    "devious"
+]
 
-[tool.poetry.group.dev.dependencies]
-ruff = ">=0.1.6"
-pre-commit=">=3.5.0"
-pytest = ">=7.4.3"
-pytest-cases = ">=3.8.1"
-pytest-cov=">=4.1.0"
-pylint=">=3.0.2" # TODO: Check if needed for Django linting or possible with VSCode extension
-pylint-django=">=2.5.5"
-pylint-plugin-utils=">=0.8.2"
-pip-licenses=">=4.3.3"
-build = ">=1.0.3"
-twine = ">=4.0.2"
-toml = ">=0.10.2"
+[tool.uv]
+package = false
+
+[tool.uv.sources]
+devious = { workspace = true }
+
+[tool.uv.workspace]
+members = [
+    "tools/devious"
+]
 
 [tool.ruff]
 line-length = 120
@@ -31,3 +41,6 @@ lint.isort.combine-as-imports = true
 
 [tool.pylint]
 max-line-length = 120
+
+[tool.setuptools]
+py-modules = []
