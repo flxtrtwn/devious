@@ -8,9 +8,14 @@ from devious.targets.microservice.microservice import Microservice
 from devious.targets.target import Target
 from devious.targets.webapp.webapp import Webapp
 
-spec = importlib.util.spec_from_file_location("registered_targets", REPO_CONFIG.registered_targets_path)
-registered_targets = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(registered_targets)
+if spec := importlib.util.spec_from_file_location("registered_targets", REPO_CONFIG.registered_targets_path):
+    registered_targets = importlib.util.module_from_spec(spec)
+    if loader := spec.loader:
+        loader.exec_module(registered_targets)
+    else:
+        raise ValueError("No loader for spec")
+else:
+    raise ValueError("No spec on import path")
 
 REGISTERED_TARGETS: List[Target] = registered_targets.REGISTERED_TARGETS
 
