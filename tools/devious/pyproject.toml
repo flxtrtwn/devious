@@ -1,6 +1,6 @@
 [project]
 name = "devious"
-version = "0.18.4"
+version = "0.18.5"
 description = "Generic development cli for various application types."
 authors = [{name = "Felix Trautwein <mail@felixtrautwein.de>"}]
 readme = "readme.md"
@@ -14,6 +14,7 @@ dependencies = [
     "jstyleson>=0.0.2",
     "ruamel.yaml>=0.18.5",
     "python-dotenv>=1.1.0",
+    # Django Apps
     "Django>=4.2.7",
     "django-bootstrap-v5>=1.0.11",
     "django-theme-soft-design>=1.0.10",
@@ -28,7 +29,6 @@ dependencies = [
 [project.scripts]
 devious = "devious.cli:cli"
 
-# Django Apps
 
 
 [build-system]

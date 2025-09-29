@@ -576,7 +576,7 @@ requires-dist = [
 
 [[package]]
 name = "devious"
-version = "0.18.4"
+version = "0.18.5"
 source = { editable = "tools/devious" }
 dependencies = [
     { name = "click" },
