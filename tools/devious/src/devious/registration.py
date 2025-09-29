@@ -1,4 +1,5 @@
 import importlib
+import importlib.util
 from typing import Dict, List, Type
 
 from devious.config import REPO_CONFIG
@@ -7,7 +8,10 @@ from devious.targets.microservice.microservice import Microservice
 from devious.targets.target import Target
 from devious.targets.webapp.webapp import Webapp
 
-registered_targets = importlib.import_module("registered_targets", package=str(REPO_CONFIG.registered_targets_path))
+spec = importlib.util.spec_from_file_location("registered_targets", REPO_CONFIG.registered_targets_path)
+registered_targets = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(registered_targets)
+
 REGISTERED_TARGETS: List[Target] = registered_targets.REGISTERED_TARGETS
 
 
