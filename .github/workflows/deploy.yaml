@@ -11,8 +11,11 @@ on:
 jobs:
     deploy:
         runs-on: ubuntu-latest
-        env:
-            UV_PUBLISH_TOKEN: ${{ secrets.PYPI_API_KEY }}
+        environment:
+            name: pypi
+        permissions:
+            id-token: write
+            contents: read
 
         steps:
             - name: Checkout repo
@@ -22,6 +25,7 @@ jobs:
             - name: Install Python 3.13
               run: uv python install 3.13
             - name: Build
+              working-directory: tools/devious
               run: uv build
             - name: Publish
               run: uv publish
