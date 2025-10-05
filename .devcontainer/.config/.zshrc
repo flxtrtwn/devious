@@ -39,6 +39,6 @@ fi
 
 export PATH="/${HOME}/.local/bin:$PATH"
 
-export XAUTHORITY=${HOME}/.Xauthority.docker
+# export XAUTHORITY=${HOME}/.Xauthority.docker
 
 eval "$(direnv hook zsh)"
