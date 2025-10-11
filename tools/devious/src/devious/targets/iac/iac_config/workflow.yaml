@@ -1,0 +1,110 @@
+name: Deploy
+
+on:
+    #TODO: Call from your main workflow
+    workflow_call:
+        inputs:
+            target_dir:
+                required: true
+                type: string
+            domain_name:
+                required: true
+                type: string
+            hetzner_ssh_key_name:
+                required: true
+                type: string
+            hetzner_s3_name:
+                required: true
+                type: string
+        secrets:
+            personal_access_token:
+                required: true
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+        env:
+            DOMAIN_NAME: ${{ inputs.domain_name }}
+            HETZNER_SSH_KEY_NAME: ${{ inputs.hetzner_ssh_key_name }}
+            HETZNER_S3_NAME: ${{ inputs.hetzner_s3_name }}
+            HETZNER_S3_KEY: ${{ inputs.domain_name }}.tfstate
+
+        steps:
+            - name: Checkout repo
+              uses: actions/checkout@v5
+
+            - name: Setup Python
+              uses: actions/setup-python@v6
+
+            - name: Setup Terraform
+              uses: hashicorp/setup-terraform@v3
+              with:
+                  terraform_version: 1.13.3
+
+            - name: Install Ansible
+              run: pip install ansible-core
+
+            - name: Cache Ansible roles
+              uses: actions/cache@v4
+              with:
+                  path: ~/.ansible/roles
+                  key: ${{ runner.os }}-ansible-roles-${{ hashFiles('${{ inputs.target_dir }}/ansible_requirements.yaml') }}
+                  restore-keys: |
+                      ${{ runner.os }}-ansible-roles-
+
+            - name: Cache Ansible collections
+              uses: actions/cache@v4
+              with:
+                  path: ~/.ansible/collections
+                  key: ${{ runner.os }}-ansible-collections-${{ hashFiles('${{ inputs.target_dir }}/ansible_requirements.yaml') }}
+                  restore-keys: |
+                      ${{ runner.os }}-ansible-collections-
+
+            - name: Install Ansible requirements
+              run: ansible-galaxy install -r ${{ inputs.target_dir }}/ansible_requirements.yaml
+
+            - name: Write SSH key
+              run: |
+                  mkdir -p ~/.ssh
+                  echo "${{ secrets.HETZNER_SSH_KEY }}" > ~/.ssh/id_rsa
+                  chmod 600 ~/.ssh/id_rsa
+
+            - name: Terraform Init
+              working-directory: ${{ inputs.target_dir }}
+              env:
+                  HETZNER_API_KEY: ${{ secrets.HETZNER_API_KEY }}
+              run: |
+                  terraform init \
+                    -backend-config="bucket=${HETZNER_S3_NAME}" \
+                    -backend-config="key=${HETZNER_S3_KEY}" \
+                    -backend-config="access_key=${{ secrets.HETZNER_S3_ACCESS_KEY }}" \
+                    -backend-config="secret_key=${{ secrets.HETZNER_S3_SECRET_KEY }}"
+
+            - name: Terraform Apply
+              working-directory: ${{ inputs.target_dir }}
+              env:
+                  HETZNER_API_KEY: ${{ secrets.HETZNER_API_KEY }}
+                  HETZNER_DNS_API_KEY: ${{ secrets.HETZNER_DNS_API_KEY }}
+              run: |
+                  terraform apply \
+                    -auto-approve \
+                    -var "cloud_token=${HETZNER_API_KEY}" \
+                    -var "dns_token=${HETZNER_DNS_API_KEY}" \
+                    -var "domain_name=${DOMAIN_NAME}" \
+                    -var "ssh_key_name=${HETZNER_SSH_KEY_NAME}"
+
+            - name: Export Ansible inventory
+              working-directory: ${{ inputs.target_dir }}
+              run: terraform output -json ansible_inventory > inventory.json
+
+            - name: Wait for SSH to be ready
+              run: |
+                  until nc -zv $(jq -r '.all.hosts.web.ansible_host' ${{ inputs.target_dir }}/inventory.json) 22; do
+                    echo "Waiting for SSH..."
+                    sleep 5
+                  done
+
+            - name: Run Ansible Playbook
+              env:
+                  ANSIBLE_COLLECTIONS_PATH: ~/.ansible/collections
+              working-directory: ${{ inputs.target_dir }}
+              run: ansible-playbook -i inventory.json ansible.yaml --ssh-extra-args="-o StrictHostKeyChecking=no"

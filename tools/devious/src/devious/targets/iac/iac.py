@@ -1,19 +1,18 @@
 import logging
 import os
-import string
-from contextlib import contextmanager
+import shutil
 from pathlib import Path, PurePath
-from typing import Any, Dict, Generator, List
+from typing import Dict, List
 
 import dotenv
 import ruamel.yaml
 
 from devious.config import REPO_CONFIG
-from devious.targets import target
 from devious.targets.target import Target
+from devious.utils import substitute_placeholders
 from devious.wrappers import docker, linux, pytest, ssh
 
-WEBAPP_CONFIG_DIR = Path(__file__).parent / "webapp_config/"
+IAC_CONFIG_DIR = Path(__file__).parent / "iac_config/"
 NGINX_CONFIG_DIR = Path(__file__).parent / "nginx_config/"
 
 YAML = ruamel.yaml.YAML()
@@ -21,11 +20,8 @@ YAML = ruamel.yaml.YAML()
 logger = logging.getLogger()
 
 
-class Webapp(Target):
-    """A webapp is a docker compose unit that can be deployed to a VM.
-    It is expected that the VM runs an NGINX instance.
-    Reverse-proxying requests to the service is configured on deploy.
-    If no NGINX is installed on the deployment VM, it is installed."""
+class Iac(Target):
+    """An Infrastructure as code target is a terraform + ansible project with potentially containerized application deployment."""
 
     def __init__(
         self,
@@ -59,14 +55,21 @@ class Webapp(Target):
         (target_src_dir / "__init__.py").touch()
         target_tests_dir = target_dir / "tests"
         target_tests_dir.mkdir(parents=True)
-        target.extend_pythonpath(target_src_dir.parent)
         docker_compose_file = target_dir / "docker-compose.yaml"
         ruamel.yaml.YAML().dump(
             {"services": {target_name: {"build": {"context": ".", "network": "host"}, "ports": None}}},
             docker_compose_file,
         )
-        (target_dir / "secrets.yaml").write_text("path/to/file:\n  - SECRET_ID")
-        logger.info("Your target %s was set up, please register it in registered_targets.py.", target_name)
+        shutil.copy(IAC_CONFIG_DIR / "main.tf", target_dir)
+        shutil.copy(IAC_CONFIG_DIR / "ansible_requirements.yaml", target_dir)
+        shutil.copy(
+            IAC_CONFIG_DIR / "workflow.yaml",
+            REPO_CONFIG.project_root / ".github" / "workflows" / f"deploy-{target_name}.yaml",
+        )
+        logger.info(
+            "Your target %s was set up, please register it in registered_targets.py and fulfill all #TODOS.",
+            target_name,
+        )
 
     def verify(self) -> bool:
         if super().verify():
@@ -150,25 +153,6 @@ class Webapp(Target):
     def stop(self) -> None:
         with ssh.SSHSession(self.domain_name) as session:
             session.run(docker.docker_compose_stop(docker_compose_yaml=self.deployed_docker_compose_yaml))
-
-
-@contextmanager
-def substitute_placeholders(
-    placeholders: Dict[Path, List[str]], environment: Dict[str, str]
-) -> Generator[None, Any, None]:
-    """Copy a file with string substitution."""
-    for path, strings_to_substitute in placeholders.items():
-        for string_to_substitute in strings_to_substitute:
-            if string_to_substitute not in environment:
-                raise ValueError(f"{string_to_substitute} not defined in environment.")
-    backed_up_files: Dict[Path, str] = {path: path.read_text(encoding="utf-8") for path in placeholders}
-    for path, content in backed_up_files.items():
-        path.write_text(string.Template(content).substitute(environment), encoding="utf-8")
-    try:
-        yield
-    finally:
-        for path, content in backed_up_files.items():
-            path.write_text(content, encoding="utf-8")
 
 
 def configure_compose(dir: Path, app_name: str, app_docker_ports: dict[int, int]) -> None:

@@ -4,6 +4,7 @@ from typing import Dict, List, Type
 
 from devious.config import REPO_CONFIG
 from devious.targets.django_app.django_app import DjangoApp
+from devious.targets.iac.iac import Iac
 from devious.targets.microservice.microservice import Microservice
 from devious.targets.target import Target
 from devious.targets.webapp.webapp import Webapp
@@ -40,4 +41,9 @@ def verify_registration() -> bool:
     return len(target_names) != len(set(target_names))
 
 
-KNOWN_TARGETS: Dict[str, Type[Target]] = {"django-app": DjangoApp, "microservice": Microservice, "webapp": Webapp}
+KNOWN_TARGETS: Dict[str, Type[Target]] = {
+    "django-app": DjangoApp,
+    "microservice": Microservice,
+    "webapp": Webapp,
+    "iac": Iac,
+}
